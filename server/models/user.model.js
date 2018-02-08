@@ -14,12 +14,21 @@ const UserSchema = new mongoose.Schema({
   mobileNumber: {
     type: String,
     required: true,
-    match: [/^[1-9][0-9]{9}$/, 'The value of path {PATH} ({VALUE}) is not a valid mobile number.']
+    match: [/^\d{3}\d{2}\d{2}\d{3}$/, 'The value of path {PATH} ({VALUE}) is not a valid mobile number.']
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  email: {
+    type: String,
+    required: true,
+    match: [/^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Please fill a valid email address']
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  cardId: {
+    type: String,
+    required: true
+  },
 });
 
 /**
@@ -54,6 +63,26 @@ UserSchema.statics = {
         const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
         return Promise.reject(err);
       });
+  },
+
+    /**
+     * Get user by username
+     * @param {username} username - The login of user.
+     * @returns {Promise<User, APIError>}
+     */
+
+  getUserByLogin(username) {
+    return this.find({
+      username
+    })
+            .exec()
+            .then((user) => {
+              if (user) {
+                return user[0];
+              }
+              const err = new APIError('No such login exists!', httpStatus.NOT_FOUND);
+              return Promise.reject(err);
+            });
   },
 
   /**
