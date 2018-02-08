@@ -4,6 +4,8 @@ import chai, { expect } from 'chai';
 import app from '../../index';
 
 chai.config.includeStack = true;
+/* token for auth. Expiration time - 1000 days */
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImtpbmdyZWVuIiwidXNlcklkIjoiNWE3YWQxMmVmYTFhYWU3MWQzM2U3ODI2IiwiaWF0IjoxNTE4MDg3Mzg4LCJleHAiOjE2MDQ0ODczODh9.FtW-VQxa7zRFDiZnYIdwKF_c2u6_ymVANSrjmNyjPZY';
 
 describe('## Misc', () => {
   describe('# GET /api/health-check', () => {
@@ -36,6 +38,7 @@ describe('## Misc', () => {
     it('should handle mongoose CastError - Cast to ObjectId failed', (done) => {
       request(app)
         .get('/api/users/56z787zzz67fc')
+        .set('Authorization', token)
         .expect(httpStatus.INTERNAL_SERVER_ERROR)
         .then((res) => {
           expect(res.body.message).to.equal('Internal Server Error');
@@ -47,12 +50,13 @@ describe('## Misc', () => {
     it('should handle express validation error - username is required', (done) => {
       request(app)
         .post('/api/users')
+        .set('Authorization', token)
         .send({
           mobileNumber: '1234567890'
         })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
-          expect(res.body.message).to.equal('"username" is required');
+          expect(res.body.message).to.equal('"username" is required and "email" is required and "password" is required and "cardId" is required');
           done();
         })
         .catch(done);

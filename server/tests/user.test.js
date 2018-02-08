@@ -6,6 +6,9 @@ import app from '../../index';
 
 chai.config.includeStack = true;
 
+/* token for auth. Expiration time - 1000 days */
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImtpbmdyZWVuIiwidXNlcklkIjoiNWE3YWQxMmVmYTFhYWU3MWQzM2U3ODI2IiwiaWF0IjoxNTE4MDg3Mzg4LCJleHAiOjE2MDQ0ODczODh9.FtW-VQxa7zRFDiZnYIdwKF_c2u6_ymVANSrjmNyjPZY';
+
 /**
  * root level hooks
  */
@@ -20,18 +23,25 @@ after((done) => {
 describe('## User APIs', () => {
   let user = {
     username: 'KK123',
-    mobileNumber: '1234567890'
+    mobileNumber: '1234567890',
+    email: 'kk123@testmail.com',
+    password: '3333',
+    cardId: '121213'
   };
 
   describe('# POST /api/users', () => {
     it('should create a new user', (done) => {
       request(app)
         .post('/api/users')
+        .set('Authorization', token)
         .send(user)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.username).to.equal(user.username);
           expect(res.body.mobileNumber).to.equal(user.mobileNumber);
+          expect(res.body.email).to.equal(user.email);
+          expect(res.body.password).to.equal(user.password);
+          expect(res.body.cardId).to.equal(user.cardId);
           user = res.body;
           done();
         })
@@ -43,6 +53,7 @@ describe('## User APIs', () => {
     it('should get user details', (done) => {
       request(app)
         .get(`/api/users/${user._id}`)
+        .set('Authorization', token)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.username).to.equal(user.username);
@@ -55,6 +66,7 @@ describe('## User APIs', () => {
     it('should report error with message - Not found, when user does not exists', (done) => {
       request(app)
         .get('/api/users/56c787ccc67fc16ccc1a5e92')
+        .set('Authorization', token)
         .expect(httpStatus.NOT_FOUND)
         .then((res) => {
           expect(res.body.message).to.equal('Not Found');
@@ -69,6 +81,7 @@ describe('## User APIs', () => {
       user.username = 'KK';
       request(app)
         .put(`/api/users/${user._id}`)
+        .set('Authorization', token)
         .send(user)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -84,6 +97,7 @@ describe('## User APIs', () => {
     it('should get all users', (done) => {
       request(app)
         .get('/api/users')
+        .set('Authorization', token)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body).to.be.an('array');
@@ -95,6 +109,7 @@ describe('## User APIs', () => {
     it('should get all users (with limit and skip)', (done) => {
       request(app)
         .get('/api/users')
+        .set('Authorization', token)
         .query({ limit: 10, skip: 1 })
         .expect(httpStatus.OK)
         .then((res) => {
@@ -109,6 +124,7 @@ describe('## User APIs', () => {
     it('should delete user', (done) => {
       request(app)
         .delete(`/api/users/${user._id}`)
+        .set('Authorization', token)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.username).to.equal('KK');

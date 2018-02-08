@@ -32,5 +32,12 @@ export default {
       username: Joi.string().required(),
       password: Joi.string().required()
     }
+  },
+
+  // POST /api/tracking/chekin
+  checkin: {
+    body: {
+      cardId: Joi.string().required()
+    }
   }
 };

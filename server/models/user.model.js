@@ -84,7 +84,24 @@ UserSchema.statics = {
               return Promise.reject(err);
             });
   },
-
+    /**
+     * Check if user with card exist
+     * @param {cardId} cardid - The Id of user card.
+     * @returns {Promise<Tracking, APIError>}
+     */
+  getUserByCard(cardId) {
+    return this.find({
+      cardId
+    })
+            .exec()
+            .then((user) => {
+              if (user) {
+                return user[0];
+              }
+              const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
+              return Promise.reject(err);
+            });
+  },
   /**
    * List users in descending order of 'createdAt' timestamp.
    * @param {number} skip - Number of users to be skipped.
