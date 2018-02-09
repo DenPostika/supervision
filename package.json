@@ -66,9 +66,7 @@
     "gulp-newer": "^1.1.0",
     "gulp-nodemon": "^2.0.6",
     "gulp-sourcemaps": "^1.6.0",
-    "gulp-util": "^3.0.7"
-  },
-  "devDependencies": {
+    "gulp-util": "^3.0.7",
     "babel-cli": "6.18.0",
     "babel-core": "6.18.0",
     "babel-plugin-add-module-exports": "0.2.1",
