@@ -4,12 +4,17 @@ import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
 import paramValidation from '../../config/param-validation';
-import userCtrl from '../controllers/user.controller';
 import config from '../../config/config';
+import trackCtrl from '../controllers/tracking.controller';
 
 const router = express.Router(); // eslint-disable-line new-cap
+
+/** POST /api/auth/login - Returns token if correct username and password is provided */
+router.route('/')
+    .post(validate(paramValidation.checkin), trackCtrl.checkIn);
+
 router
-    /** Middlewear for checkong accesible */
+/** Middlewear for checkong accesible */
     .use((req, res, next) => {
       if (req.headers.authorization) {
         try {
@@ -20,24 +25,9 @@ router
         }
       } else throw new APIError('Authentication error. Empty token', httpStatus.UNAUTHORIZED, true);
     });
+
 router.route('/')
-  /** GET /api/users - Get list of users */
-  .get(userCtrl.list)
-
-  /** POST /api/users - Create new user */
-  .post(validate(paramValidation.createUser), userCtrl.create);
-
-router.route('/:userId')
-  /** GET /api/users/:userId - Get user */
-  .get(userCtrl.get)
-
-  /** PUT /api/users/:userId - Update user */
-  .put(validate(paramValidation.updateUser), userCtrl.update)
-
-  /** DELETE /api/users/:userId - Delete user */
-  .delete(userCtrl.remove);
-
-/** Load user when API with userId route parameter is hit */
-router.param('userId', userCtrl.load);
+/** GET /api/tracking - Get list of users */
+    .get(trackCtrl.list);
 
 export default router;

@@ -5,7 +5,10 @@ export default {
   createUser: {
     body: {
       username: Joi.string().required(),
-      mobileNumber: Joi.string().regex(/^[1-9][0-9]{9}$/).required()
+      mobileNumber: Joi.string().regex(/^\d{3}\d{2}\d{2}\d{3}$/).required(),
+      email: Joi.string().regex(/^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/).required(),
+      password: Joi.string().required(),
+      cardId: Joi.string().required(),
     }
   },
 
@@ -13,7 +16,10 @@ export default {
   updateUser: {
     body: {
       username: Joi.string().required(),
-      mobileNumber: Joi.string().regex(/^[1-9][0-9]{9}$/).required()
+      mobileNumber: Joi.string().regex(/^\d{3}\d{2}\d{2}\d{3}$/).required(),
+      email: Joi.string().regex(/^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/).required(),
+      password: Joi.string().required(),
+      cardId: Joi.string().required(),
     },
     params: {
       userId: Joi.string().hex().required()
@@ -25,6 +31,13 @@ export default {
     body: {
       username: Joi.string().required(),
       password: Joi.string().required()
+    }
+  },
+
+  // POST /api/tracking/chekin
+  checkin: {
+    body: {
+      cardId: Joi.string().required()
     }
   }
 };
