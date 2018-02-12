@@ -1,5 +1,6 @@
-import User from '../models/user.model';
+import md5 from 'js-md5';
 
+import User from '../models/user.model';
 
 /**
  * Load user and append to req.
@@ -32,14 +33,17 @@ function create(req, res, next) {
     username: req.body.username,
     mobileNumber: req.body.mobileNumber,
     email: req.body.email,
-    password: req.body.password,
+    password: md5(req.body.password),
     cardId: req.body.cardId,
     slackName: req.body.slackName,
   });
 
   user.save()
     .then(savedUser => res.json(savedUser))
-    .catch(e => next(e));
+    .catch(e => {
+      console.log(e);
+      next(e)
+    });
 }
 
 /**
@@ -53,7 +57,6 @@ function update(req, res, next) {
   user.username = req.body.username;
   user.mobileNumber = req.body.mobileNumber;
   user.email = req.body.email;
-  user.password = req.body.password;
   user.cardId = req.body.cardId;
 
   user.save()

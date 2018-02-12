@@ -54,7 +54,16 @@ UserSchema.path('slackName').validate(value => {
   } else {
     return false;
   }
-});
+}, 'Slack name does not exist!');
+
+UserSchema.path('username').validate((value, done) => {
+  mongoose.model('User', UserSchema).count({ username: value }).then((count, err) => {
+    if (err) {
+      return done(err);
+    }
+    return done(!count);
+  });
+}, 'Username already exist!');
 
 /**
  * Methods
