@@ -1,3 +1,5 @@
+import httpStatus from 'http-status';
+import APIError from '../helpers/APIError';
 import User from '../models/user.model';
 
 
@@ -29,11 +31,15 @@ function get(req, res) {
  * @returns {User}
  */
 function create(req, res, next) {
+  if (User.isUsernameExists(req.body.username)) {
+    throw new APIError('User already exists', httpStatus.METHOD_FAILURE, true);
+  }
   const user = new User({
     username: req.body.username,
     mobileNumber: req.body.mobileNumber,
     email: req.body.email,
     password: req.body.password,
+    type: req.body.type,
     cardId: req.body.cardId,
     slackName: req.body.slackName,
   });
@@ -41,6 +47,30 @@ function create(req, res, next) {
   user.save()
     .then(savedUser => res.json(savedUser))
     .catch(e => next(e));
+}
+
+/**
+ * Create admin
+ * @property {string} req.body.username - The username of user.
+ * @property {string} req.body.mobileNumber - The mobileNumber of user.
+ * @returns {User}
+ */
+function createAdmin(req, res, next) {
+  console.log(User.isAdminExist);
+  if (!User.isAdminExist) {
+    const user = new User({
+      username: req.body.username,
+      mobileNumber: req.body.mobileNumber,
+      email: req.body.email,
+      password: req.body.password,
+      type: 'admin',
+      cardId: req.body.cardId,
+    });
+
+    user.save()
+          .then(savedUser => res.json(savedUser))
+          .catch(e => next(e));
+  } else throw new APIError('Admin already exists', httpStatus.METHOD_FAILURE, true);
 }
 
 /**
@@ -55,6 +85,7 @@ function update(req, res, next) {
   user.mobileNumber = req.body.mobileNumber;
   user.email = req.body.email;
   user.password = req.body.password;
+  user.type = req.body.type;
   user.cardId = req.body.cardId;
 
   user.save()
@@ -86,4 +117,4 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-export default { load, get, create, update, list, remove };
+export default { load, get, create, update, list, remove, createAdmin };

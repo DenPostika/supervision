@@ -8,8 +8,13 @@ import userCtrl from '../controllers/user.controller';
 import config from '../../config/config';
 
 const router = express.Router(); // eslint-disable-line new-cap
+
+router.route('/admin')
+/** POST /api/users - Create new user */
+    .post(validate(paramValidation.createUser), userCtrl.createAdmin);
+
 router
-    /** Middlewear for checkong accesible */
+    /** Middlewear for checking accesible */
     .use((req, res, next) => {
       if (req.headers.authorization) {
         try {
@@ -22,22 +27,36 @@ router
     });
 router.route('/')
   /** GET /api/users - Get list of users */
-  .get(userCtrl.list)
+  .get(userCtrl.list);
 
+router.route('/:userId')
+/** GET /api/users/:userId - Get user */
+    .get(userCtrl.get);
+
+
+/** Load user when API with userId route parameter is hit */
+router.param('userId', userCtrl.load);
+
+/* TODO: create role-permission collection*/
+router
+/** Middlewear for checking if this admin */
+    .use((req, res, next) => {
+      const decoded = jwt.verify(req.headers.authorization, config.jwtSecret);
+      if (decoded.type !== 'admin') {
+        throw new APIError('Permission denied.', httpStatus.FORBIDDEN, true);
+      }
+      next();
+    });
+
+router.route('/')
   /** POST /api/users - Create new user */
   .post(validate(paramValidation.createUser), userCtrl.create);
 
 router.route('/:userId')
-  /** GET /api/users/:userId - Get user */
-  .get(userCtrl.get)
+    /** PUT /api/users/:userId - Update user */
+    .put(validate(paramValidation.updateUser), userCtrl.update)
 
-  /** PUT /api/users/:userId - Update user */
-  .put(validate(paramValidation.updateUser), userCtrl.update)
-
-  /** DELETE /api/users/:userId - Delete user */
-  .delete(userCtrl.remove);
-
-/** Load user when API with userId route parameter is hit */
-router.param('userId', userCtrl.load);
+    /** DELETE /api/users/:userId - Delete user */
+    .delete(userCtrl.remove);
 
 export default router;

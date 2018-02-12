@@ -26,6 +26,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    default: 'employee'
+  },
   cardId: {
     type: String,
     required: true,
@@ -59,6 +63,7 @@ UserSchema.path('slackName').validate((value) => {
  * Methods
  */
 UserSchema.method({});
+
 
 /**
  * Statics
@@ -98,11 +103,33 @@ UserSchema.statics = {
               return Promise.reject(err);
             });
   },
-  /**
-   * Check if user with card exist
-   * @param {cardId} cardid - The Id of user card.
-   * @returns {Promise<Tracking, APIError>}
-   */
+
+
+    /**
+     * Check for admin exist
+     * @param {username} username - The login of user.
+     * @returns {Promise<User, APIError>}
+     */
+
+  isAdminExist() {
+    return this.find({
+      type: 'admin'
+    })
+            .exec()
+            .then((user) => {
+              if (user) {
+                return user[0];
+              }
+              const err = new APIError('No such login exists!', httpStatus.NOT_FOUND);
+              return Promise.reject(err);
+            });
+  },
+
+    /**
+     * Check if user with card exist
+     * @param {cardId} cardid - The Id of user card.
+     * @returns {Promise<Tracking, APIError>}
+     */
   getUserByCard(cardId) {
     return this.find({
       cardId

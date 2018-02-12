@@ -9,7 +9,7 @@ import trackCtrl from '../controllers/tracking.controller';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
-/** POST /api/auth/login - Returns token if correct username and password is provided */
+/** POST /api/auth/login - Returns checkIn data and save it */
 router.route('/')
     .post(validate(paramValidation.checkin), trackCtrl.checkIn);
 
@@ -18,7 +18,10 @@ router
     .use((req, res, next) => {
       if (req.headers.authorization) {
         try {
-          jwt.verify(req.headers.authorization, config.jwtSecret);
+          const decoded = jwt.verify(req.headers.authorization, config.jwtSecret);
+          if (decoded.type !== 'admin') {
+            throw new APIError('Permission denied.', httpStatus.FORBIDDEN, true);
+          }
           next();
         } catch (err) {
           throw new APIError(`Authentication error. ${err.message}`, httpStatus.UNAUTHORIZED, true);
@@ -27,7 +30,7 @@ router
     });
 
 router.route('/')
-/** GET /api/tracking - Get list of users */
+/** GET /api/tracking - Get list of checkIns */
     .get(trackCtrl.list);
 
 export default router;

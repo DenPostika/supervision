@@ -6,7 +6,7 @@ import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
 
 /**
- * Returns jwt token if valid username and password is provided
+ * Returns checkIn data and save it
  * @param req
  * @param res
  * @param next
@@ -29,7 +29,7 @@ function checkIn(req, res, next) {
 }
 
 /**
- * Returns jwt token if valid username and password is provided
+ * Returns tracking list if valid token is provided in header
  * @param req
  * @param res
  * @param next
