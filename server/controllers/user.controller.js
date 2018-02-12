@@ -1,4 +1,5 @@
 import httpStatus from 'http-status';
+import passwordHash from 'password-hash';
 import APIError from '../helpers/APIError';
 import User from '../models/user.model';
 
@@ -38,7 +39,7 @@ function create(req, res, next) {
     username: req.body.username,
     mobileNumber: req.body.mobileNumber,
     email: req.body.email,
-    password: req.body.password,
+    password: passwordHash.generate(req.body.password),
     type: req.body.type,
     cardId: req.body.cardId,
     slackName: req.body.slackName,
@@ -56,15 +57,15 @@ function create(req, res, next) {
  * @returns {User}
  */
 function createAdmin(req, res, next) {
-  console.log(User.isAdminExist);
   if (!User.isAdminExist) {
     const user = new User({
       username: req.body.username,
       mobileNumber: req.body.mobileNumber,
       email: req.body.email,
-      password: req.body.password,
+      password: passwordHash.generate(req.body.password),
       type: 'admin',
       cardId: req.body.cardId,
+      slackName: req.body.slackName,
     });
 
     user.save()
@@ -84,9 +85,10 @@ function update(req, res, next) {
   user.username = req.body.username;
   user.mobileNumber = req.body.mobileNumber;
   user.email = req.body.email;
-  user.password = req.body.password;
+  user.password = passwordHash.generate(req.body.password);
   user.type = req.body.type;
   user.cardId = req.body.cardId;
+  user.slackName = req.body.slackName;
 
   user.save()
     .then(savedUser => res.json(savedUser))

@@ -64,7 +64,6 @@ UserSchema.path('slackName').validate((value) => {
  */
 UserSchema.method({});
 
-
 /**
  * Statics
  */
@@ -124,12 +123,11 @@ UserSchema.statics = {
               return Promise.reject(err);
             });
   },
-
-    /**
-     * Check if user with card exist
-     * @param {cardId} cardid - The Id of user card.
-     * @returns {Promise<Tracking, APIError>}
-     */
+  /**
+   * Check if user with card exist
+   * @param {cardId} cardid - The Id of user card.
+   * @returns {Promise<Tracking, APIError>}
+   */
   getUserByCard(cardId) {
     return this.find({
       cardId

@@ -68,7 +68,8 @@
     "gulp-nodemon": "^2.0.6",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
-    "slackbots": "^1.1.0"
+    "slackbots": "^1.1.0",
+    "password-hash": "1.2.2"
   },
   "devDependencies": {
     "babel-cli": "6.18.0",

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
+import passwordHash from 'password-hash';
 import APIError from '../helpers/APIError';
 import config from '../../config/config';
 import User from '../models/user.model';
@@ -18,7 +19,7 @@ function login(req, res, next) {
         if (!user) {
           throw new APIError('Authentication error. User doesn\'t exist', httpStatus.UNAUTHORIZED, true);
         }
-        if (req.body.password === user.password) {
+        if (passwordHash.verify(req.body.password, user.password)) {
           const token = jwt.sign({
             username: user.username,
             userId: user._id,

@@ -6,9 +6,10 @@ const Bot = new SlackBot({
 });
 
 Bot.on('message', (data) => {
-  console.log(data);
+  const user = Bot.getUsers()._value.members.find(obj => obj.id === data.user);
+  console.log(user);
   if (data.type === 'message' && !data.bot_id) {
-    Bot.postMessageToUser('denis_postyka', 'hi', {
+    Bot.postMessageToUser(user.name, `Hi, ${user.name}`, {
       as_user: true,
     });
   }
