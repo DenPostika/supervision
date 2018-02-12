@@ -5,9 +5,10 @@ import User from '../models/user.model';
  * Load user and append to req.
  */
 function load(req, res, next, id) {
+  const request = req;
   User.get(id)
     .then((user) => {
-      req.user = user; // eslint-disable-line no-param-reassign
+      request.user = user;
       return next();
     })
     .catch(e => next(e));
@@ -34,6 +35,7 @@ function create(req, res, next) {
     email: req.body.email,
     password: req.body.password,
     cardId: req.body.cardId,
+    slackName: req.body.slackName,
   });
 
   user.save()
