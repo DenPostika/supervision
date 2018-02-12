@@ -15,7 +15,6 @@ import User from '../models/user.model';
 function checkIn(req, res, next) {
   User.getUserByCard(req.body.cardId)
         .then((user) => {
-          console.log(user);
           if (user) {
             const tracking = new Tracking({
               cardId: user.cardId,

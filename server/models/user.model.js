@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
+import Bot from '../slack/index';
 
 /**
  * User Schema
@@ -9,25 +10,29 @@ import APIError from '../helpers/APIError';
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true
+    required: true,
   },
   mobileNumber: {
     type: String,
     required: true,
-    match: [/^\d{3}\d{2}\d{2}\d{3}$/, 'The value of path {PATH} ({VALUE}) is not a valid mobile number.']
+    match: [/^\d{3}\d{2}\d{2}\d{3}$/, 'The value of path {PATH} ({VALUE}) is not a valid mobile number.'],
   },
   email: {
     type: String,
     required: true,
-    match: [/^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Please fill a valid email address']
+    match: [/^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Please fill a valid email address'],
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   cardId: {
     type: String,
-    required: true
+    required: true,
+  },
+  slackName: {
+    type: String,
+    required: true,
   },
 });
 
@@ -37,12 +42,24 @@ const UserSchema = new mongoose.Schema({
  * - validations
  * - virtuals
  */
+UserSchema.path('slackName').validate(value => {
+  const users = Bot.getUsers()._value.members;
+  if (users) {
+    for (let i = 0; i < users.length; i += 1) {
+      if (users[i].name === value) {
+        return true;
+      }
+    }
+    return false;
+  } else {
+    return false;
+  }
+});
 
 /**
  * Methods
  */
-UserSchema.method({
-});
+UserSchema.method({});
 
 /**
  * Statics
@@ -64,13 +81,11 @@ UserSchema.statics = {
         return Promise.reject(err);
       });
   },
-
-    /**
-     * Get user by username
-     * @param {username} username - The login of user.
-     * @returns {Promise<User, APIError>}
-     */
-
+  /**
+   * Get user by username
+   * @param {username} username - The login of user.
+   * @returns {Promise<User, APIError>}
+   */
   getUserByLogin(username) {
     return this.find({
       username
@@ -84,11 +99,11 @@ UserSchema.statics = {
               return Promise.reject(err);
             });
   },
-    /**
-     * Check if user with card exist
-     * @param {cardId} cardid - The Id of user card.
-     * @returns {Promise<Tracking, APIError>}
-     */
+  /**
+   * Check if user with card exist
+   * @param {cardId} cardid - The Id of user card.
+   * @returns {Promise<Tracking, APIError>}
+   */
   getUserByCard(cardId) {
     return this.find({
       cardId

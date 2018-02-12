@@ -4,12 +4,6 @@ import APIError from '../helpers/APIError';
 import config from '../../config/config';
 import User from '../models/user.model';
 
-// sample user, used for authentication
-// const user = {
-//   username: 'react',
-//   password: 'express'
-// };
-
 /**
  * Returns jwt token if valid username and password is provided
  * @param req

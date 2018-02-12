@@ -35,6 +35,7 @@ const config = {
   port: envVars.PORT,
   mongooseDebug: envVars.MONGOOSE_DEBUG,
   jwtSecret: envVars.JWT_SECRET,
+  slackToken: envVars.SLACK_TOKEN,
   mongo: {
     host: envVars.MONGO_HOST
   }
