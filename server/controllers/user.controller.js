@@ -32,22 +32,23 @@ function get(req, res) {
  * @returns {User}
  */
 function create(req, res, next) {
-  if (User.isUsernameExists(req.body.username)) {
-    throw new APIError('User already exists', httpStatus.METHOD_FAILURE, true);
-  }
   const user = new User({
     username: req.body.username,
     mobileNumber: req.body.mobileNumber,
     email: req.body.email,
     password: passwordHash.generate(req.body.password),
     type: req.body.type,
-    cardId: req.body.cardId,
     slackName: req.body.slackName,
   });
-
-  user.save()
-    .then(savedUser => res.json(savedUser))
-    .catch(e => next(e));
+  const error = user.validateSync();
+  console.log(error);
+  if (user.validateSync()) {
+    user.save()
+          .then(savedUser => res.json(savedUser))
+          .catch((e) => {
+            next(e);
+          });
+  }
 }
 
 /**

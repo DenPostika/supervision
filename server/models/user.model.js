@@ -11,6 +11,17 @@ const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
+    validate: {
+      validator: (value) => {
+        mongoose.model('User', UserSchema).count({ username: value }).then((count, err) => {
+          if (err) {
+            return false;
+          }
+          return !count;
+        });
+      },
+      message: 'Username already exists!'
+    }
   },
   mobileNumber: {
     type: String,
@@ -25,6 +36,7 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    select: false
   },
   type: {
     type: String,
@@ -32,12 +44,27 @@ const UserSchema = new mongoose.Schema({
   },
   cardId: {
     type: String,
-    required: true,
+    required: false,
   },
   slackName: {
     type: String,
     required: true,
-  },
+    validate: {
+      validator(value) {
+        const users = Bot.getUsers()._value.members;
+        if (users) {
+          for (let i = 0; i < users.length; i += 1) {
+            if (users[i].name === value) {
+              return true;
+            }
+          }
+          return false;
+        }
+        return false;
+      },
+      message: 'Slack name doesn\'t exist'
+    }
+  }
 });
 
 /**
@@ -46,6 +73,7 @@ const UserSchema = new mongoose.Schema({
  * - validations
  * - virtuals
  */
+
 UserSchema.path('slackName').validate((value) => {
   const users = Bot.getUsers()._value.members;
   if (users) {
@@ -57,7 +85,16 @@ UserSchema.path('slackName').validate((value) => {
     return false;
   }
   return false;
-});
+}, 'Slack name does not exist!');
+
+UserSchema.path('username').validate((value, done) => {
+  mongoose.model('User', UserSchema).count({ username: value }).then((count, err) => {
+    if (err) {
+      return done(err);
+    }
+    return done(!count);
+  });
+}, 'Username already exist!');
 
 /**
  * Methods
@@ -93,6 +130,7 @@ UserSchema.statics = {
     return this.find({
       username
     })
+            .select('+password')
             .exec()
             .then((user) => {
               if (user) {

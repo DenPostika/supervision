@@ -9,7 +9,7 @@ export default {
       email: Joi.string().email().required(),
       password: Joi.string().required(),
       type: Joi.string().regex(/admin|employee/),
-      cardId: Joi.string().required(),
+      slackName: Joi.string().required(),
     }
   },
 
@@ -21,7 +21,7 @@ export default {
       email: Joi.string().email().required(),
       password: Joi.string().required(),
       type: Joi.string().regex(/admin|employee/),
-      cardId: Joi.string().required(),
+      slackName: Joi.string().required(),
     },
     params: {
       userId: Joi.string().hex().required()

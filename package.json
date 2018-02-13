@@ -55,12 +55,14 @@
     "helmet": "3.1.0",
     "http-status": "^0.2.0",
     "joi": "10.0.6",
+    "js-md5": "^0.7.3",
     "jsonwebtoken": "7.1.9",
     "method-override": "^2.3.5",
     "moment": "^2.20.1",
     "mongoose": "4.7.4",
     "morgan": "1.7.0",
     "winston": "2.3.0",
+    "slackbots": "^1.1.0",
     "gulp": "3.9.1",
     "gulp-babel": "6.1.2",
     "gulp-load-plugins": "^1.2.0",
@@ -68,7 +70,6 @@
     "gulp-nodemon": "^2.0.6",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
-    "slackbots": "^1.1.0",
     "password-hash": "1.2.2"
   },
   "devDependencies": {

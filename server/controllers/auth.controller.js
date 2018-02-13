@@ -5,7 +5,6 @@ import APIError from '../helpers/APIError';
 import config from '../../config/config';
 import User from '../models/user.model';
 
-
 /**
  * Returns jwt token if valid username and password is provided
  * @param req
