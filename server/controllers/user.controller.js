@@ -1,14 +1,16 @@
-import md5 from 'js-md5';
-
+import httpStatus from 'http-status';
+import passwordHash from 'password-hash';
+import APIError from '../helpers/APIError';
 import User from '../models/user.model';
 
 /**
  * Load user and append to req.
  */
 function load(req, res, next, id) {
+  const request = req;
   User.get(id)
     .then((user) => {
-      req.user = user;
+      request.user = user;
       return next();
     })
     .catch(e => next(e));
@@ -33,17 +35,44 @@ function create(req, res, next) {
     username: req.body.username,
     mobileNumber: req.body.mobileNumber,
     email: req.body.email,
-    password: md5(req.body.password),
-    cardId: req.body.cardId,
+    password: passwordHash.generate(req.body.password),
+    type: req.body.type,
     slackName: req.body.slackName,
   });
 
-  user.save()
-    .then(savedUser => res.json(savedUser))
-    .catch(e => {
-      console.log(e);
-      next(e)
+  user.save((err, savedUser) => {
+    if (err) res.json(err);
+    else res.json(savedUser);
+  })
+   .catch((e) => {
+     next(e);
+   });
+}
+
+/**
+ * Create admin
+ * @property {string} req.body.username - The username of user.
+ * @property {string} req.body.mobileNumber - The mobileNumber of user.
+ * @returns {User}
+ */
+function createAdmin(req, res, next) {
+  if (!User.isAdminExist) {
+    const user = new User({
+      username: req.body.username,
+      mobileNumber: req.body.mobileNumber,
+      email: req.body.email,
+      password: passwordHash.generate(req.body.password),
+      type: 'admin',
+      cardId: req.body.cardId,
+      slackName: req.body.slackName,
     });
+
+    user.save((err, savedUser) => {
+      if (err) res.json(err);
+      else res.json(savedUser);
+    })
+    .catch(e => next(e));
+  } else throw new APIError('Admin already exists', httpStatus.METHOD_FAILURE, true);
 }
 
 /**
@@ -57,11 +86,16 @@ function update(req, res, next) {
   user.username = req.body.username;
   user.mobileNumber = req.body.mobileNumber;
   user.email = req.body.email;
+  user.password = passwordHash.generate(req.body.password);
+  user.type = req.body.type;
   user.cardId = req.body.cardId;
+  user.slackName = req.body.slackName;
 
-  user.save()
-    .then(savedUser => res.json(savedUser))
-    .catch(e => next(e));
+  user.save((err, savedUser) => {
+    if (err) res.json(err);
+    else res.json(savedUser);
+  })
+  .catch(e => next(e));
 }
 
 /**
@@ -88,4 +122,4 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-export default { load, get, create, update, list, remove };
+export default { load, get, create, update, list, remove, createAdmin };

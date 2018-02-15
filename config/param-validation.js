@@ -6,9 +6,10 @@ export default {
     body: {
       username: Joi.string().required(),
       mobileNumber: Joi.string().regex(/^\d{3}\d{2}\d{2}\d{3}$/).required(),
-      email: Joi.string().regex(/^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/).required(),
+      email: Joi.string().email().required(),
       password: Joi.string().required(),
-      cardId: Joi.string().required(),
+      type: Joi.string().regex(/admin|employee/),
+      slackName: Joi.string().required(),
     }
   },
 
@@ -17,9 +18,10 @@ export default {
     body: {
       username: Joi.string().required(),
       mobileNumber: Joi.string().regex(/^\d{3}\d{2}\d{2}\d{3}$/).required(),
-      email: Joi.string().regex(/^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/).required(),
+      email: Joi.string().email().required(),
       password: Joi.string().required(),
-      cardId: Joi.string().required(),
+      type: Joi.string().regex(/admin|employee/),
+      slackName: Joi.string().required(),
     },
     params: {
       userId: Joi.string().hex().required()

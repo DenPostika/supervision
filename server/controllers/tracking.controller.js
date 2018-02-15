@@ -1,17 +1,21 @@
-// import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
+import SlackBot from 'slackbots';
 import APIError from '../helpers/APIError';
-// import config from '../../config/config';
 import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
+import config from '../../config/config';
 
+const Bot = new SlackBot({
+  token: config.slackToken,
+});
 /**
- * Returns jwt token if valid username and password is provided
+ * Returns checkIn data and save it
  * @param req
  * @param res
  * @param next
  * @returns {*}
  */
+
 function checkIn(req, res, next) {
   User.getUserByCard(req.body.cardId)
         .then((user) => {
@@ -20,16 +24,32 @@ function checkIn(req, res, next) {
               cardId: user.cardId,
             });
             tracking.save();
+
+            Tracking.getTodayFirstCheckIn()
+                .then((record) => {
+                  const worktime = new Date();
+                  if (!record) {
+                    worktime.setHours(worktime.getHours() + 9);
+
+                    Bot.postMessageToUser(user.slackName, `Hi, ${user.username}. Your work day will end at ${worktime.toTimeString()}`, {
+                      as_user: true,
+                    });
+                  } else if (record.checkIn.setHours(worktime.getHours() + 9) <= worktime) {
+                    Bot.postMessageToUser(user.slackName, `Hi again. Your work day finished at ${worktime.toTimeString()}`, {
+                      as_user: true,
+                    });
+                  }
+                })
+                .catch(e => next(e));
+
             res.json(tracking);
-          }
-          throw new APIError('Invalid card number', httpStatus.UNAUTHORIZED, true);
+          } else throw new APIError('Invalid card number', httpStatus.UNAUTHORIZED, true);
         })
-        .then(user => res.json(user))
         .catch(e => next(e));
 }
 
 /**
- * Returns jwt token if valid username and password is provided
+ * Returns tracking list if valid token is provided in header
  * @param req
  * @param res
  * @param next

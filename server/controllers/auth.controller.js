@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
+import passwordHash from 'password-hash';
 import APIError from '../helpers/APIError';
 import config from '../../config/config';
 import User from '../models/user.model';
@@ -14,17 +15,21 @@ import User from '../models/user.model';
 function login(req, res, next) {
   User.getUserByLogin(req.body.username)
       .then((user) => {
-        if (user && req.body.password === user.password) {
+        if (!user) {
+          throw new APIError('Authentication error. User doesn\'t exist', httpStatus.UNAUTHORIZED, true);
+        }
+        if (passwordHash.verify(req.body.password, user.password)) {
           const token = jwt.sign({
             username: user.username,
-            userId: user._id
+            userId: user._id,
+            type: user.type
           }, config.jwtSecret, { expiresIn: '1h' });
           return res.json({
             token,
             username: user.username,
           });
         }
-        throw new APIError('Authentication error', httpStatus.UNAUTHORIZED, true);
+        throw new APIError('Authentication error. Wrong password', httpStatus.UNAUTHORIZED, true);
       })
       .then(user => res.json(user))
       .catch(e => next(e));

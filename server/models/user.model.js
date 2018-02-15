@@ -25,15 +25,20 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    select: false
+  },
+  type: {
+    type: String,
+    default: 'employee'
   },
   cardId: {
     type: String,
-    required: true,
+    required: false,
   },
   slackName: {
     type: String,
     required: true,
-  },
+  }
 });
 
 /**
@@ -64,6 +69,37 @@ UserSchema.path('username').validate((value, done) => {
     return done(!count);
   });
 }, 'Username already exist!');
+
+UserSchema.path('slackName').validate((value) => {
+  const users = Bot.getUsers()._value.members;
+  if (users) {
+    for (let i = 0; i < users.length; i += 1) {
+      if (users[i].name === value) {
+        return true;
+      }
+    }
+    return false;
+  }
+  return false;
+}, 'Slack name doesn\'t exist!');
+
+UserSchema.path('username').validate((value, done) => {
+  mongoose.model('User', UserSchema).count({ username: value }).then((count, err) => {
+    if (err) {
+      return done(err);
+    }
+    return done(!count);
+  });
+}, 'Username already exist!');
+
+UserSchema.path('email').validate((value, done) => {
+  mongoose.model('User', UserSchema).count({ email: value }).then((count, err) => {
+    if (err) {
+      return done(err);
+    }
+    return done(!count);
+  });
+}, 'Email already registred!');
 
 /**
  * Methods
@@ -98,6 +134,28 @@ UserSchema.statics = {
   getUserByLogin(username) {
     return this.find({
       username
+    })
+            .select('+password')
+            .exec()
+            .then((user) => {
+              if (user) {
+                return user[0];
+              }
+              const err = new APIError('No such login exists!', httpStatus.NOT_FOUND);
+              return Promise.reject(err);
+            });
+  },
+
+
+    /**
+     * Check for admin exist
+     * @param {username} username - The login of user.
+     * @returns {Promise<User, APIError>}
+     */
+
+  isAdminExist() {
+    return this.find({
+      type: 'admin'
     })
             .exec()
             .then((user) => {

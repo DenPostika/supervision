@@ -9,37 +9,41 @@ import config from '../../config/config';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
-// router
-//     /** Middlewear for checkong accesible */
-//     .use((req, res, next) => {
-//       if (req.headers.authorization) {
-//         try {
-//           jwt.verify(req.headers.authorization, config.jwtSecret);
-//           next();
-//         } catch (err) {
-//           throw new APIError(`Authentication error. ${err.message}`, httpStatus.UNAUTHORIZED, true);
-//         }
-//       } else throw new APIError('Authentication error. Empty token', httpStatus.UNAUTHORIZED, true);
-//     });
+/** POST /api/users/admin - Create new user */
+router.route('/admin')
+    .post(validate(paramValidation.createUser), userCtrl.createAdmin);
+
+router.route('/')
+/** POST /api/users - Create new user */
+    .post(validate(paramValidation.createUser), userCtrl.create);
 
 router.route('/')
   /** GET /api/users - Get list of users */
-  .get(userCtrl.list)
-
-  /** POST /api/users - Create new user */
-  .post(validate(paramValidation.createUser), userCtrl.create);
+  .get(userCtrl.list);
 
 router.route('/:userId')
-  /** GET /api/users/:userId - Get user */
-  .get(userCtrl.get)
+/** GET /api/users/:userId - Get user */
+    .get(userCtrl.get);
 
-  /** PUT /api/users/:userId - Update user */
-  .put(validate(paramValidation.updateUser), userCtrl.update)
-
-  /** DELETE /api/users/:userId - Delete user */
-  .delete(userCtrl.remove);
 
 /** Load user when API with userId route parameter is hit */
 router.param('userId', userCtrl.load);
+
+/* TODO: create role-permission collection*/
+router
+/** Middlewear for checking if this admin */
+    .use((req, res, next) => {
+      const decoded = jwt.verify(req.headers.authorization, config.jwtSecret);
+      if (decoded.type === 'admin' || decoded.username === req.body.username) {
+        next();
+      } else throw new APIError('Permission denied.', httpStatus.FORBIDDEN, true);
+    });
+
+router.route('/:userId')
+    /** PUT /api/users/:userId - Update user */
+    .put(validate(paramValidation.updateUser), userCtrl.update)
+
+    /** DELETE /api/users/:userId - Delete user */
+    .delete(userCtrl.remove);
 
 export default router;

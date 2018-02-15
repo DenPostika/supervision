@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
-import moment from 'moment';
+// import moment from 'moment';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
 
@@ -35,6 +35,20 @@ TrackSchema.method({
  * Statics
  */
 TrackSchema.statics = {
+/**
+ * Get first checkIn record created today
+ * @param
+ * @returns {Promise<Tracking, APIError>}
+ */
+  getTodayFirstCheckIn() {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return this.findOne(
+      {
+        checkIn: { $gte: new Date(startOfToday.setHours(0, 0, 0, 0)) }
+      });
+  },
+
     /**
      * Get cards be date range
      * @param dateStart date format yyyy-mm-dd
@@ -42,19 +56,22 @@ TrackSchema.statics = {
      * @returns {Promise<Tracking, APIError>}
      */
   getCardsByDateRange({ dateStart = 0, dateEnd = Date.parse(new Date()) } = {}) {
+    const end = new Date(dateEnd);
+
     return this.find(
       {
         created_on:
         {
-          $gt: moment(dateStart),
-          $lte: moment(dateEnd).day(+1)
+          $gt: new Date(dateStart),
+          $lte: end.setDate(end.getDate() + 1)
         }
       });
   },
 
+
     /**
      * Get checkIns by cardId
-     * @param {cardId} cardId - The card number.
+     * @param {string} cardId - The card number.
      * @returns {Promise<Tracking, APIError>}
      */
 
@@ -76,9 +93,11 @@ TrackSchema.statics = {
      * List users in descending order of 'createdAt' timestamp.
      * @param {number} skip - Number of checkIns to be skipped.
      * @param {number} limit - Limit number of checkIns to be returned.
+     * @param {string} dateStart - date format yyyy-mm-dd
+     * @param {string} dateEnd - date format yyyy-mm-dd
      * @returns {Promise<Tracking[]>}
      */
-  list({ limit = 50, skip = 0, dateStart = 0, dateEnd = Date.parse(new Date() + 1) } = {}) {
+  list({ limit = 50, skip = 0, dateStart = 0, dateEnd = Date.parse(new Date()) } = {}) {
     const end = new Date(dateEnd);
     return this.find({
       checkIn:

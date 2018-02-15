@@ -37,7 +37,7 @@ const config = {
   jwtSecret: envVars.JWT_SECRET,
   slackToken: envVars.SLACK_TOKEN,
   mongo: {
-    host: envVars.MONGO_HOST
+    host: process.env.MONGO_HOST
   }
 };
 
