@@ -14,4 +14,6 @@ router.route('/')
 /** GET /api/tracking - Get list of checkIns */
     .get(trackCtrl.list);
 
+
+
 export default router;

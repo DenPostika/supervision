@@ -35,6 +35,20 @@ TrackSchema.method({
  * Statics
  */
 TrackSchema.statics = {
+/**
+ * Get first checkIn record created today
+ * @param
+ * @returns {Promise<Tracking, APIError>}
+ */
+  getTodayFirstCheckIn() {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return this.findOne(
+      {
+        checkIn: { $gte: new Date(startOfToday.setHours(0, 0, 0, 0)) }
+      });
+  },
+
     /**
      * Get cards be date range
      * @param dateStart date format yyyy-mm-dd
@@ -53,6 +67,7 @@ TrackSchema.statics = {
         }
       });
   },
+
 
     /**
      * Get checkIns by cardId

@@ -40,15 +40,14 @@ function create(req, res, next) {
     type: req.body.type,
     slackName: req.body.slackName,
   });
-  const error = user.validateSync();
-  console.log(error);
-  if (user.validateSync()) {
-    user.save()
-          .then(savedUser => res.json(savedUser))
-          .catch((e) => {
-            next(e);
-          });
-  }
+
+  user.save((err, savedUser) => {
+    if (err) res.json(err);
+    else res.json(savedUser);
+  })
+   .catch((e) => {
+     next(e);
+   });
 }
 
 /**
@@ -69,9 +68,11 @@ function createAdmin(req, res, next) {
       slackName: req.body.slackName,
     });
 
-    user.save()
-          .then(savedUser => res.json(savedUser))
-          .catch(e => next(e));
+    user.save((err, savedUser) => {
+      if (err) res.json(err);
+      else res.json(savedUser);
+    })
+    .catch(e => next(e));
   } else throw new APIError('Admin already exists', httpStatus.METHOD_FAILURE, true);
 }
 
@@ -91,9 +92,11 @@ function update(req, res, next) {
   user.cardId = req.body.cardId;
   user.slackName = req.body.slackName;
 
-  user.save()
-    .then(savedUser => res.json(savedUser))
-    .catch(e => next(e));
+  user.save((err, savedUser) => {
+    if (err) res.json(err);
+    else res.json(savedUser);
+  })
+  .catch(e => next(e));
 }
 
 /**

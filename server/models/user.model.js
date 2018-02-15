@@ -11,17 +11,6 @@ const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    validate: {
-      validator: (value) => {
-        mongoose.model('User', UserSchema).count({ username: value }).then((count, err) => {
-          if (err) {
-            return false;
-          }
-          return !count;
-        });
-      },
-      message: 'Username already exists!'
-    }
   },
   mobileNumber: {
     type: String,
@@ -49,21 +38,6 @@ const UserSchema = new mongoose.Schema({
   slackName: {
     type: String,
     required: true,
-    validate: {
-      validator(value) {
-        const users = Bot.getUsers()._value.members;
-        if (users) {
-          for (let i = 0; i < users.length; i += 1) {
-            if (users[i].name === value) {
-              return true;
-            }
-          }
-          return false;
-        }
-        return false;
-      },
-      message: 'Slack name doesn\'t exist'
-    }
   }
 });
 
@@ -85,7 +59,7 @@ UserSchema.path('slackName').validate((value) => {
     return false;
   }
   return false;
-}, 'Slack name does not exist!');
+}, 'Slack name doesn\'t exist!');
 
 UserSchema.path('username').validate((value, done) => {
   mongoose.model('User', UserSchema).count({ username: value }).then((count, err) => {
@@ -95,6 +69,15 @@ UserSchema.path('username').validate((value, done) => {
     return done(!count);
   });
 }, 'Username already exist!');
+
+UserSchema.path('email').validate((value, done) => {
+  mongoose.model('User', UserSchema).count({ email: value }).then((count, err) => {
+    if (err) {
+      return done(err);
+    }
+    return done(!count);
+  });
+}, 'Email already registred!');
 
 /**
  * Methods
