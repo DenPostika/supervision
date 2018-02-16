@@ -27,7 +27,7 @@ router.use('/auth', authRoutes);
 /** Middlewear for checking accesible */
 router
     .use((req, res, next) => {
-      if (req.method === 'POST' && exeption.post.indexOf(req.originalUrl)) {
+      if (req.method === 'POST' && exeption.post.indexOf(req.originalUrl) > -1) {
         next();
       } else if (req.headers.authorization) {
         try {
