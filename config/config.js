@@ -33,7 +33,7 @@ if (error) {
 const config = {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
-  mongooseDebug: envVprocess.env.MONGOOSE_DEBUG,
+  mongooseDebug: process.env.MONGOOSE_DEBUG,
   jwtSecret: process.env.JWT_SECRET,
   slackToken: process.env.SLACK_TOKEN,
   mongo: {
