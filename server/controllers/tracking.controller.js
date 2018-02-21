@@ -21,6 +21,7 @@ function checkIn(req, res, next) {
           cardId: user.cardId,
         });
         tracking.save();
+        moment.locale('uk');
 
         Tracking.getTodayCheckIn()
           .then(records => {
