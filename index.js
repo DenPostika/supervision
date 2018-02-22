@@ -5,6 +5,7 @@ import util from 'util';
 import config from './config/config';
 import app from './config/express';
 import moment from 'moment';
+import './config/socket.io';
 import './server/slack';
 
 const debug = require('debug')('express-mongoose-es6-rest-api:index');

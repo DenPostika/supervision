@@ -1,4 +1,6 @@
 import httpStatus from 'http-status';
+import store from 'store';
+import io from '../../config/socket.io';
 import APIError from '../helpers/APIError';
 import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
@@ -14,75 +16,81 @@ import moment from 'moment';
  */
 
 function checkIn(req, res, next) {
-  User.getUserByCard(req.body.cardId)
-    .then(user => {
-      if (user) {
-        const tracking = new Tracking({
-          cardId: user.cardId,
-        });
-        tracking.save();
+  if (!store.get('wait-card')) {
+    User.getUserByCard(req.body.cardId)
+      .then(user => {
+        if (user) {
+          const tracking = new Tracking({
+            cardId: user.cardId,
+          });
+          tracking.save();
 
-        Tracking.getTodayCheckIn()
-          .then(records => {
-            let worktime = null;
-            if (!records.length) {
-              worktime = moment();
-              worktime.add(9, 'hours');
+          Tracking.getTodayCheckIn()
+            .then(records => {
+              let worktime = null;
+              if (!records.length) {
+                worktime = moment();
+                worktime.add(9, 'hours');
 
-              Bot.postMessageToUser(
-                user.slackName,
-                `Привет, ${
-                  user.username
-                }! Твой рабочий день закончится в ${worktime.format('LT')}`,
-                {
-                  as_user: true,
-                },
-              );
-            } else {
-              worktime = countWorkTime(records);
-              console.log(records.length);
-              if (records.length % 2 !== 0) {
-                // Приход
                 Bot.postMessageToUser(
                   user.slackName,
-                  `Ты отработал уже ${worktime.hours} ч ${
-                    worktime.minutes
-                  } м ты можешь уйти в ${moment()
-                    .add(9 - worktime.hours, 'hours')
-                    .add(
-                      worktime.minutes !== 0 ? 60 - worktime.minutes : 0,
-                      'minutes',
-                    )
-                    .format('LT')}`,
+                  `Привет, ${
+                    user.username
+                    }! Твой рабочий день закончится в ${worktime.format('LT')}`,
                   {
                     as_user: true,
                   },
                 );
-              } else if (worktime.hours > 9) {
-                // Уход
-                Bot.postMessageToUser(
-                  user.slackName,
-                  `День закончен ты отработал ${worktime.hours} ч ${
-                    worktime.minutes
-                  } м`,
-                  {
-                    as_user: true,
-                  },
-                );
+              } else {
+                worktime = countWorkTime(records);
+                console.log(records.length);
+                if (records.length % 2 !== 0) {
+                  // Приход
+                  Bot.postMessageToUser(
+                    user.slackName,
+                    `Ты отработал уже ${worktime.hours} ч ${
+                      worktime.minutes
+                      } м ты можешь уйти в ${moment()
+                      .add(9 - worktime.hours, 'hours')
+                      .add(
+                        worktime.minutes !== 0 ? 60 - worktime.minutes : 0,
+                        'minutes',
+                      )
+                      .format('LT')}`,
+                    {
+                      as_user: true,
+                    },
+                  );
+                } else if (worktime.hours > 9) {
+                  // Уход
+                  Bot.postMessageToUser(
+                    user.slackName,
+                    `День закончен ты отработал ${worktime.hours} ч ${
+                      worktime.minutes
+                      } м`,
+                    {
+                      as_user: true,
+                    },
+                  );
+                }
               }
-            }
-          })
-          .catch(e => next(e));
+            })
+            .catch(e => next(e));
 
-        res.json(tracking);
-      } else
-        throw new APIError(
-          'Invalid card number',
-          httpStatus.UNAUTHORIZED,
-          true,
-        );
-    })
-    .catch(e => next(e));
+          res.json(tracking);
+        } else
+          throw new APIError(
+            'Invalid card number',
+            httpStatus.UNAUTHORIZED,
+            true,
+          );
+      })
+      .catch(e => next(e));
+  } else {
+    io.emit('card-id', req.body.cardId);
+    store.set('wait-card', false);
+    res.send('OK');
+  }
 }
 
 function countWorkTime(records) {
