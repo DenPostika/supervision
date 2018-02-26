@@ -1,9 +1,9 @@
 import httpStatus from 'http-status';
+import moment from 'moment';
 import APIError from '../helpers/APIError';
 import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
 import Bot from '../slack';
-import moment from 'moment';
 
 /**
  * Returns checkIn data and save it
@@ -15,7 +15,7 @@ import moment from 'moment';
 
 function checkIn(req, res, next) {
   User.getUserByCard(req.body.cardId)
-    .then(user => {
+    .then((user) => {
       if (user) {
         const tracking = new Tracking({
           cardId: user.cardId,
@@ -24,7 +24,7 @@ function checkIn(req, res, next) {
         moment.locale('uk');
 
         Tracking.getTodayCheckIn()
-          .then(records => {
+          .then((records) => {
             let worktime = null;
             if (!records.length) {
               worktime = moment();
@@ -37,12 +37,12 @@ function checkIn(req, res, next) {
                 }! Твой рабочий день закончится в ${worktime.format('LT')}`,
                 {
                   as_user: true,
-                },
+                }
               );
             } else {
               worktime = countWorkTime(records);
               console.log(records.length);
-              if (records.length % 2 !== 0) {
+              if (worktime.hours < 9) {
                 // Приход
                 Bot.postMessageToUser(
                   user.slackName,
@@ -52,12 +52,12 @@ function checkIn(req, res, next) {
                     .add(9 - worktime.hours, 'hours')
                     .add(
                       worktime.minutes !== 0 ? 60 - worktime.minutes : 0,
-                      'minutes',
+                      'minutes'
                     )
                     .format('LT')}`,
                   {
                     as_user: true,
-                  },
+                  }
                 );
               } else if (worktime.hours > 9) {
                 // Уход
@@ -68,7 +68,7 @@ function checkIn(req, res, next) {
                   } м`,
                   {
                     as_user: true,
-                  },
+                  }
                 );
               }
             }
@@ -76,12 +76,13 @@ function checkIn(req, res, next) {
           .catch(e => next(e));
 
         res.json(tracking);
-      } else
+      } else {
         throw new APIError(
           'Invalid card number',
           httpStatus.UNAUTHORIZED,
-          true,
+          true
         );
+      }
     })
     .catch(e => next(e));
 }
@@ -98,7 +99,7 @@ function countWorkTime(records) {
       worktime = moment(records[i + 1].checkIn)
         .diff(
           moment(records[i].checkIn),
-          'minutes',
+          'minutes'
         );
     }
   }
@@ -124,7 +125,7 @@ function list(req, res, next) {
     dateEnd = Date.parse(new Date()),
   } = req.query;
   Tracking.list({ limit, skip, dateStart, dateEnd })
-    .then(tracks => {
+    .then((tracks) => {
       res.json(tracks);
     })
     .catch(e => next(e));
