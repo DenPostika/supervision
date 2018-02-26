@@ -42,7 +42,7 @@ function checkIn(req, res, next) {
             } else {
               worktime = countWorkTime(records);
               console.log(records.length);
-              if (worktime.hours < 9) {
+              if (worktime.hours < 9 && records.length % 2 === 0) {
                 // Приход
                 Bot.postMessageToUser(
                   user.slackName,
