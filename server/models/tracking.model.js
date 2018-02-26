@@ -49,7 +49,16 @@ TrackSchema.statics = {
       });
   },
 
-    /**
+  getTodayCheckIn() {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return this.find(
+      {
+        checkIn: { $gte: new Date(startOfToday.setHours(0, 0, 0, 0)) }
+      });
+  },
+
+  /**
      * Get cards be date range
      * @param dateStart date format yyyy-mm-dd
      * @param dateEnd date format yyyy-mm-dd

@@ -47,7 +47,7 @@ const UserSchema = new mongoose.Schema({
  * - validations
  * - virtuals
  */
-UserSchema.path('slackName').validate(value => {
+UserSchema.path('slackName').validate((value) => {
   const users = Bot.getUsers()._value.members;
   if (users) {
     for (let i = 0; i < users.length; i += 1) {
@@ -56,9 +56,8 @@ UserSchema.path('slackName').validate(value => {
       }
     }
     return false;
-  } else {
-    return false;
   }
+  return false;
 }, 'Slack name does not exist!');
 
 UserSchema.path('username').validate((value, done) => {
