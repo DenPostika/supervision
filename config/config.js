@@ -26,19 +26,18 @@ const envVarsSchema = Joi.object({
   .required();
 
 const { error, value: envVars } = Joi.validate(process.env, envVarsSchema);
-console.log(envVars);
 if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
 const config = {
-  env: process.env.NODE_ENV,
-  port: process.env.PORT,
-  mongooseDebug: process.env.MONGOOSE_DEBUG,
-  jwtSecret: process.env.JWT_SECRET,
-  slackToken: process.env.SLACK_TOKEN,
+  env: envVars.NODE_ENV,
+  port: envVars.PORT,
+  mongooseDebug: envVars.MONGOOSE_DEBUG,
+  jwtSecret: envVars.JWT_SECRET,
+  slackToken: envVars.SLACK_TOKEN,
   mongo: {
-    host: process.env.MONGO_HOST
+    host: envVars.MONGO_HOST
   }
 };
 
