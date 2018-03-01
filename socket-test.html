@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Test</title>
+</head>
+<body>
+
+<div class="card-id">
+    <h1>Card ID</h1>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+<script>
+  $(function() {
+    var socket = io.connect('http://localhost:3000');
+
+    socket.on('card-id', (data) => {
+      $('.card-id h1').text(data);
+    });
+  });
+</script>
+</body>
+</html>

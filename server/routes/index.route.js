@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
+import store from 'store';
 import APIError from '../helpers/APIError';
 import config from '../../config/config';
 import userRoutes from './user.route';
@@ -20,6 +21,11 @@ const router = express.Router(); // eslint-disable-line new-cap
 router.get('/health-check', (req, res) =>
   res.send('OK')
 );
+
+router.post('/wait-card-id', (req, res) => {
+  store.set('wait-card', true);
+  res.send('OK');
+});
 
 // mount auth routes at /auth
 router.use('/auth', authRoutes);
