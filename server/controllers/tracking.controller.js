@@ -5,7 +5,7 @@ import APIError from '../helpers/APIError';
 import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
 import Bot from '../slack';
-import io from '../../config/socket.io';
+import { io } from '../../index';
 
 /**
  * Returns checkIn data and save it
