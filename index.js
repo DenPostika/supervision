@@ -30,7 +30,7 @@ mongoose.connect(mongoUri, {
     },
   },
 });
-mongoose.connection.on('error', error => {
+mongoose.connection.on('error', (error) => {
   throw new Error(`unable to connect to database: ${error}`);
 });
 

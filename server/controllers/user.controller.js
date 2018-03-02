@@ -1,7 +1,10 @@
+import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
 import passwordHash from 'password-hash';
 import APIError from '../helpers/APIError';
 import User from '../models/user.model';
+import config from '../../config/config';
+
 
 /**
  * Load user and append to req.
@@ -37,12 +40,23 @@ function create(req, res, next) {
     email: req.body.email,
     password: passwordHash.generate(req.body.password),
     type: req.body.type,
+    cardId: req.body.cardId,
     slackName: req.body.slackName,
   });
 
   user.save((err, savedUser) => {
     if (err) res.json(err);
-    else res.json(savedUser);
+    else {
+      const token = jwt.sign({
+        username: savedUser.username,
+        userId: savedUser._id,
+        type: savedUser.type
+      }, config.jwtSecret, { expiresIn: '1h' });
+      res.json({
+        savedUser,
+        token,
+      });
+    }
   })
    .catch((e) => {
      next(e);
