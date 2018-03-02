@@ -18,7 +18,7 @@ import io from '../../config/socket.io';
 function checkIn(req, res, next) {
   if (!store.get('wait-card')) {
     User.getUserByCard(req.body.cardId)
-      .then(user => {
+      .then((user) => {
         if (user) {
           const tracking = new Tracking({
             cardId: user.cardId,
@@ -27,7 +27,7 @@ function checkIn(req, res, next) {
           moment.locale('uk');
 
           Tracking.getTodayCheckIn()
-            .then(records => {
+            .then((records) => {
               let worktime = null;
               if (!records.length) {
                 worktime = moment();
@@ -40,7 +40,7 @@ function checkIn(req, res, next) {
                   }! Твой рабочий день закончится в ${worktime.format('LT')}`,
                   {
                     as_user: true,
-                  },
+                  }
                 );
               } else {
                 worktime = countWorkTime(records);
@@ -55,12 +55,12 @@ function checkIn(req, res, next) {
                       .add(9 - worktime.hours, 'hours')
                       .add(
                         worktime.minutes !== 0 ? 60 - worktime.minutes : 0,
-                        'minutes',
+                        'minutes'
                       )
                       .format('LT')}`,
                     {
                       as_user: true,
-                    },
+                    }
                   );
                 } else if (worktime.hours > 9) {
                   // Уход
@@ -71,7 +71,7 @@ function checkIn(req, res, next) {
                     } м`,
                     {
                       as_user: true,
-                    },
+                    }
                   );
                 }
               }
@@ -83,7 +83,7 @@ function checkIn(req, res, next) {
           throw new APIError(
             'Invalid card number',
             httpStatus.UNAUTHORIZED,
-            true,
+            true
           );
         }
       })
@@ -106,7 +106,7 @@ function countWorkTime(records) {
     if (records[i + 1]) {
       worktime = moment(records[i + 1].checkIn).diff(
         moment(records[i].checkIn),
-        'minutes',
+        'minutes'
       );
     }
   }
@@ -132,7 +132,7 @@ function list(req, res, next) {
     dateEnd = Date.parse(new Date()),
   } = req.query;
   Tracking.list({ limit, skip, dateStart, dateEnd })
-    .then(tracks => {
+    .then((tracks) => {
       res.json(tracks);
     })
     .catch(e => next(e));
