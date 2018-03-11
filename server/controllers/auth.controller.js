@@ -23,7 +23,7 @@ function login(req, res, next) {
             username: user.username,
             userId: user._id,
             type: user.type
-          }, config.jwtSecret, { expiresIn: '1h' });
+          }, config.jwtSecret, { expiresIn: '10h' });
           return res.json({
             token,
             username: user.username,
@@ -31,7 +31,6 @@ function login(req, res, next) {
         }
         throw new APIError('Authentication error. Wrong password', httpStatus.UNAUTHORIZED, true);
       })
-      .then(user => res.json(user))
       .catch(e => next(e));
 }
 

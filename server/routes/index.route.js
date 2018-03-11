@@ -35,9 +35,9 @@ router
     .use((req, res, next) => {
       if (req.method === 'POST' && exeption.post.indexOf(req.originalUrl) > -1) {
         next();
-      } else if (req.headers.authorization) {
+      } else if (req.headers.token) {
         try {
-          jwt.verify(req.headers.authorization, config.jwtSecret);
+          jwt.verify(req.headers.token, config.jwtSecret);
           next();
         } catch (err) {
           throw new APIError(`Authentication error. ${err.message}`, httpStatus.UNAUTHORIZED, true);
@@ -48,7 +48,6 @@ router
 
 // mount user routes at /users
 router.use('/users', userRoutes);
-
 
 // mount auth routes at /tracking
 router.use('/tracking', trackingRoutes);

@@ -5,14 +5,13 @@ import APIError from '../helpers/APIError';
 import User from '../models/user.model';
 import config from '../../config/config';
 
-
 /**
  * Load user and append to req.
  */
 function load(req, res, next, id) {
   const request = req;
   User.get(id)
-    .then((user) => {
+    .then(user => {
       request.user = user;
       return next();
     })
@@ -44,23 +43,28 @@ function create(req, res, next) {
     slackName: req.body.slackName,
   });
 
-  user.save((err, savedUser) => {
-    if (err) res.json(err);
-    else {
-      const token = jwt.sign({
-        username: savedUser.username,
-        userId: savedUser._id,
-        type: savedUser.type
-      }, config.jwtSecret, { expiresIn: '1h' });
-      res.json({
-        savedUser,
-        token,
-      });
-    }
-  })
-   .catch((e) => {
-     next(e);
-   });
+  user
+    .save((err, savedUser) => {
+      if (err) res.json(err);
+      else {
+        const token = jwt.sign(
+          {
+            username: savedUser.username,
+            userId: savedUser._id,
+            type: savedUser.type,
+          },
+          config.jwtSecret,
+          { expiresIn: '1h' },
+        );
+        res.json({
+          savedUser,
+          token,
+        });
+      }
+    })
+    .catch(e => {
+      next(e);
+    });
 }
 
 /**
@@ -81,12 +85,14 @@ function createAdmin(req, res, next) {
       slackName: req.body.slackName,
     });
 
-    user.save((err, savedUser) => {
-      if (err) res.json(err);
-      else res.json(savedUser);
-    })
-    .catch(e => next(e));
-  } else throw new APIError('Admin already exists', httpStatus.METHOD_FAILURE, true);
+    user
+      .save((err, savedUser) => {
+        if (err) res.json(err);
+        else res.json(savedUser);
+      })
+      .catch(e => next(e));
+  } else
+    throw new APIError('Admin already exists', httpStatus.METHOD_FAILURE, true);
 }
 
 /**
@@ -105,11 +111,12 @@ function update(req, res, next) {
   user.cardId = req.body.cardId;
   user.slackName = req.body.slackName;
 
-  user.save((err, savedUser) => {
-    if (err) res.json(err);
-    else res.json(savedUser);
-  })
-  .catch(e => next(e));
+  user
+    .save((err, savedUser) => {
+      if (err) res.json(err);
+      else res.json(savedUser);
+    })
+    .catch(e => next(e));
 }
 
 /**
@@ -131,7 +138,8 @@ function list(req, res, next) {
  */
 function remove(req, res, next) {
   const user = req.user;
-  user.remove()
+  user
+    .remove()
     .then(deletedUser => res.json(deletedUser))
     .catch(e => next(e));
 }
