@@ -4,8 +4,9 @@ import store from 'store';
 import APIError from '../helpers/APIError';
 import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
-import Bot from '../slack';
 import { io } from '../../index';
+import { countWorkedTime } from '../utils/countWorkedTime';
+import { firstComingMessage, comingMessage, leavingMessage } from '../slack/messages';
 
 /**
  * Returns checkIn data and save it
@@ -18,7 +19,7 @@ import { io } from '../../index';
 function checkIn(req, res, next) {
   if (!store.get('wait-card')) {
     User.getUserByCard(req.body.cardId)
-      .then((user) => {
+      .then(user => {
         if (user) {
           const tracking = new Tracking({
             cardId: user.cardId,
@@ -27,52 +28,19 @@ function checkIn(req, res, next) {
           moment.locale('uk');
 
           Tracking.getTodayCheckIn()
-            .then((records) => {
-              let worktime = null;
+            .then(records => {
+              let workTime = null;
               if (!records.length) {
-                worktime = moment();
-                worktime.add(9, 'hours');
-
-                Bot.postMessageToUser(
-                  user.slackName,
-                  `Привет, ${
-                    user.username
-                  }! Твой рабочий день закончится в ${worktime.format('LT')}`,
-                  {
-                    as_user: true,
-                  }
-                );
+                // First coming today
+                firstComingMessage(user);
               } else {
-                worktime = countWorkTime(records);
-                console.log(records.length);
-                if (worktime.hours < 9 && records.length % 2 === 0) {
-                  // Приход
-                  Bot.postMessageToUser(
-                    user.slackName,
-                    `Ты отработал уже ${worktime.hours} ч ${
-                      worktime.minutes
-                    } м ты можешь уйти в ${moment()
-                      .add(9 - worktime.hours, 'hours')
-                      .add(
-                        worktime.minutes !== 0 ? 60 - worktime.minutes : 0,
-                        'minutes'
-                      )
-                      .format('LT')}`,
-                    {
-                      as_user: true,
-                    }
-                  );
-                } else if (worktime.hours > 9) {
-                  // Уход
-                  Bot.postMessageToUser(
-                    user.slackName,
-                    `День закончен ты отработал ${worktime.hours} ч ${
-                      worktime.minutes
-                    } м`,
-                    {
-                      as_user: true,
-                    }
-                  );
+                workTime = countWorkedTime(records);
+                if (workTime.hours < 9 && records.length % 2) {
+                  // Coming
+                  comingMessage(user, workTime);
+                } else if (workTime.hours > 9) {
+                  // Leaving
+                  leavingMessage(user, workTime);
                 }
               }
             })
@@ -83,7 +51,7 @@ function checkIn(req, res, next) {
           throw new APIError(
             'Invalid card number',
             httpStatus.UNAUTHORIZED,
-            true
+            true,
           );
         }
       })
@@ -93,28 +61,6 @@ function checkIn(req, res, next) {
     store.set('wait-card', false);
     res.send('OK');
   }
-}
-
-function countWorkTime(records) {
-  let worktime = 0;
-
-  records.push({
-    checkIn: moment().format(),
-  });
-
-  for (let i = 0; i < records.length; i += 2) {
-    if (records[i + 1]) {
-      worktime = moment(records[i + 1].checkIn).diff(
-        moment(records[i].checkIn),
-        'minutes'
-      );
-    }
-  }
-
-  return {
-    hours: Math.round(worktime / 60),
-    minutes: worktime % 60,
-  };
 }
 
 /**
@@ -132,7 +78,7 @@ function list(req, res, next) {
     dateEnd = Date.parse(new Date()),
   } = req.query;
   Tracking.list({ limit, skip, dateStart, dateEnd })
-    .then((tracks) => {
+    .then(tracks => {
       res.json(tracks);
     })
     .catch(e => next(e));
