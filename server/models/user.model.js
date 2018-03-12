@@ -208,7 +208,7 @@ UserSchema.statics = {
    * @returns {Promise<User[]>}
    */
   list({ skip = 0, limit = 50 } = {}) {
-    return this.find({}, '_id username cardId')
+    return this.find({}, '_id username cardId type')
       .sort({ createdAt: -1 })
       .skip(+skip)
       .limit(+limit)
