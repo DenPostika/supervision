@@ -21,3 +21,30 @@ export const countWorkedTime = records => {
     minutes: worktime % 60,
   };
 };
+
+export const sortTracks = records => {
+
+    let sortedRecords = [];
+
+    for (let i = 0; i < records.length; i ++) {
+
+        let day = moment(records[i].checkIn).format('L');
+
+        sortedRecords[day] = !sortedRecords[day] ? [] : sortedRecords[day];
+
+        sortedRecords[day].push({
+            date: day,
+            worktime: 1,
+            coming: true,
+            leaving: null
+        })
+        // if (records[i + 1]) {
+        //     worktime = moment(records[i + 1].checkIn).diff(
+        //         moment(records[i].checkIn),
+        //         'minutes',
+        //     );
+        // }
+    }
+
+    return sortedRecords;
+};

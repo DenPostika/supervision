@@ -106,15 +106,26 @@ TrackSchema.statics = {
      * @param {string} dateEnd - date format yyyy-mm-dd
      * @returns {Promise<Tracking[]>}
      */
-  list({ limit = 50, skip = 0, dateStart = 0, dateEnd = Date.parse(new Date()) } = {}) {
+  list({ limit = 50, skip = 0, cardId = 0, dateStart = 0, dateEnd = Date.parse(new Date()) } = {}) {
     const end = new Date(dateEnd);
-    return this.find({
+    let findObj = {
       checkIn:
       {
         $gt: new Date(dateStart),
         $lte: end.setDate(end.getDate() + 1)
       }
-    })
+    };
+    if (cardId) {
+      findObj = {
+        checkIn:
+        {
+          $gt: new Date(dateStart),
+          $lte: end.setDate(end.getDate() + 1)
+        },
+        cardId
+      };
+    }
+    return this.find(findObj)
             .sort({ createdAt: -1 })
             .skip(+skip)
             .limit(+limit)

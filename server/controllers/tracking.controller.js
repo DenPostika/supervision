@@ -6,7 +6,8 @@ import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
 import Bot from '../slack';
 import io from '../../config/socket.io';
-import { countWorkedTime } from '../utils/countWorkedTime';
+import { countWorkedTime} from '../utils/countWorkedTime';
+import { sortTracks} from '../utils/sortUserTracks';
 import { firstComingMessage, comingMessage, leavingMessage } from '../slack/messages';
 
 /**
@@ -22,31 +23,45 @@ function checkIn(req, res, next) {
     User.getUserByCard(req.body.cardId)
       .then(user => {
         if (user) {
-          const tracking = new Tracking({
-            cardId: user.cardId,
-          });
-          tracking.save();
-          moment.locale('uk');
-
-          Tracking.getTodayCheckIn()
-            .then(records => {
-              let workTime = null;
-              if (!records.length) {
-                // First coming today
-                firstComingMessage(user);
-              } else {
-                workTime = countWorkedTime(records);
-                if (workTime.hours < 9 && records.length % 2) {
-                  // Coming
-                  comingMessage(user, workTime);
-                } else if (workTime.hours > 9) {
-                  // Leaving
-                  leavingMessage(user, workTime);
-                }
+          if (user.dateLeave || user.dateCome){
+              let tracking = new Tracking({
+                  cardId: user.cardId,
+              });
+              if (user.dateCome){
+                  tracking.checkIn = moment(user.dateCome).format();
+                  tracking.save();
               }
-            })
-            .catch(e => next(e));
+              if (user.dateLeave){
+                  tracking.checkIn = moment(user.dateLeave).format();
+                  tracking.save();
+              }
+          } else {
+              let tracking = new Tracking({
+                  cardId: user.cardId,
+              });
+              tracking.save();
 
+              moment.locale('uk');
+
+              Tracking.getTodayCheckIn()
+                  .then(records => {
+                    let workTime = null;
+                    if (!records.length) {
+                      // First coming today
+                      firstComingMessage(user);
+                    } else {
+                      workTime = countWorkedTime(records);
+                      if (workTime.hours < 9 && records.length % 2) {
+                        // Coming
+                        comingMessage(user, workTime);
+                      } else if (workTime.hours > 9) {
+                        // Leaving
+                        leavingMessage(user, workTime);
+                      }
+                    }
+                  })
+                  .catch(e => next(e));
+          }
           res.json(tracking);
         } else {
           throw new APIError(
@@ -75,12 +90,15 @@ function list(req, res, next) {
   const {
     limit = 50,
     skip = 0,
+    cardId = 0,
     dateStart = 0,
     dateEnd = Date.parse(new Date()),
   } = req.query;
-  Tracking.list({ limit, skip, dateStart, dateEnd })
+  Tracking.list({ limit, skip, cardId, dateStart, dateEnd })
     .then(tracks => {
-      res.json(tracks);
+      if (cardId){
+        res.json(sortTracks(tracks));
+      }else res.json(tracks);
     })
     .catch(e => next(e));
 }
