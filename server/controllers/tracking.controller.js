@@ -4,10 +4,9 @@ import store from 'store';
 import APIError from '../helpers/APIError';
 import Tracking from '../models/tracking.model';
 import User from '../models/user.model';
-import Bot from '../slack';
-import io from '../../config/socket.io';
-import { countWorkedTime} from '../utils/countWorkedTime';
 import { sortTracks} from '../utils/sortUserTracks';
+import { io } from '../../index';
+import { countWorkedTime } from '../utils/countWorkedTime';
 import { firstComingMessage, comingMessage, leavingMessage } from '../slack/messages';
 
 /**
