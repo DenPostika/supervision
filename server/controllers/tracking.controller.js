@@ -23,18 +23,19 @@ function checkIn(req, res, next) {
     User.getUserByCard(req.body.cardId)
       .then(user => {
         if (user) {
-          if (user.dateLeave || user.dateCome){
+          if (req.body.dateLeave || req.body.dateCome){
               let tracking = new Tracking({
                   cardId: user.cardId,
               });
-              if (user.dateCome){
-                  tracking.checkIn = moment(user.dateCome).format();
+              if (req.body.dateCome){
+                  tracking.checkIn = moment(req.body.dateCome).format();
                   tracking.save();
               }
-              if (user.dateLeave){
-                  tracking.checkIn = moment(user.dateLeave).format();
+              if (req.body.dateLeave){
+                  tracking.checkIn = moment(req.body.dateLeave).format();
                   tracking.save();
               }
+              res.json(tracking);
           } else {
               let tracking = new Tracking({
                   cardId: user.cardId,
@@ -61,8 +62,8 @@ function checkIn(req, res, next) {
                     }
                   })
                   .catch(e => next(e));
+              res.json(tracking);
           }
-          res.json(tracking);
         } else {
           throw new APIError(
             'Invalid card number',
