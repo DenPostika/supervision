@@ -1,6 +1,7 @@
 import moment from 'moment/moment';
 
 export const sortTracks = (records) => {
+  moment.locale('uk');
   let sortedRecords = [],
     dates = [];
 
@@ -34,8 +35,5 @@ function worktimeByDate(records) {
             );
     }
   }
-  return {
-    hours: Math.round(worktime / 60),
-    minutes: worktime % 60,
-  };
+  return worktime;
 }
