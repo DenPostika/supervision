@@ -23,18 +23,21 @@ function checkIn(req, res, next) {
       .then(user => {
         if (user) {
           if (req.body.dateLeave || req.body.dateCome){
-              let tracking = new Tracking({
-                  cardId: user.cardId,
-              });
               if (req.body.dateCome){
-                  tracking.checkIn = moment(req.body.dateCome).format();
+                  let tracking = new Tracking({
+                      cardId: user.cardId,
+                      checkIn : moment(req.body.dateCome).format()
+                  });
                   tracking.save();
               }
-              if (req.body.dateLeave){
-                  tracking.checkIn = moment(req.body.dateLeave).format();
+              if (req.body.dateLeave) {
+                  let tracking = new Tracking({
+                      cardId: user.cardId,
+                      checkIn: moment(req.body.dateLeave).format()
+                  });
                   tracking.save();
               }
-              res.json(tracking);
+              res.send('OK');
           } else {
               let tracking = new Tracking({
                   cardId: user.cardId,
