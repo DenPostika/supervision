@@ -18,7 +18,8 @@ export const sortTracks = (records) => {
       date: day,
       worktime,
       comming,
-      leaving: worktime / 60 >= 9 ? lastCheckIn : null
+      leaving: worktime / 60 >= 9 ? lastCheckIn : null,
+      onwork: !!(dates[day].length % 2)
     });
   }
   return sortedRecords;
