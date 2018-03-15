@@ -18,7 +18,7 @@ export const sortTracks = (records) => {
       date: day,
       worktime,
       comming,
-      leaving: worktime.hours >= 9 ? lastCheckIn : null
+      leaving: worktime / 60 >= 9 ? lastCheckIn : null
     });
   }
   return sortedRecords;
@@ -35,5 +35,6 @@ function worktimeByDate(records) {
             );
     }
   }
+
   return worktime;
 }
