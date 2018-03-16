@@ -23,6 +23,7 @@ function checkIn(req, res, next) {
       .then(user => {
         if (user) {
           if (req.body.dateLeave || req.body.dateCome){
+              Tracking.removeDateCheckIns(user.cardId, moment(req.body.dateCome).format('L'));
               if (req.body.dateCome){
                   let tracking = new Tracking({
                       cardId: user.cardId,

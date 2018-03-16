@@ -77,6 +77,27 @@ TrackSchema.statics = {
       });
   },
 
+    /**
+     * Remove users checkIns by date
+     * @param cardId int
+     * @param dateStart date format yyyy-mm-dd
+     * @param dateEnd date format yyyy-mm-dd
+     * @returns {Promise<Tracking, APIError>}
+     */
+  removeDateCheckIns(cardId, date = 0) {
+    const day = new Date(date);
+
+    return this.find({
+      checkIn:
+      {
+        $gt: new Date(date),
+        $lte: day.setDate(day.getDate() + 1)
+      },
+      cardId
+    })
+        .remove()
+        .exec();
+  },
 
     /**
      * Get checkIns by cardId
