@@ -34,6 +34,13 @@ router.use('/auth', authRoutes);
 router
     .use((req, res, next) => {
       if (req.method === 'POST' && exeption.post.indexOf(req.originalUrl) > -1) {
+        if (req.body.dateLeave || req.body.dateCome) {
+          const decoded = jwt.verify(req.headers.token, config.jwtSecret);
+          console.log(decoded,decoded.type !== 'admin');
+          if (decoded.type !== 'admin') {
+            throw new APIError('Authentication error. Not admin', httpStatus.UNAUTHORIZED, true);
+          }
+        }
         next();
       } else if (req.headers.token) {
         try {
