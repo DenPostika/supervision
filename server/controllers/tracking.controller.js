@@ -44,10 +44,11 @@ function checkIn(req, res, next) {
                   cardId: user.cardId,
               });
               tracking.save();
+              console.log(tracking)
 
               moment.locale('uk');
 
-              Tracking.getTodayCheckIn()
+              Tracking.getTodayCheckIn(user.cardId)
                   .then(records => {
                     let workTime = null;
                     if (!records.length) {

@@ -49,12 +49,13 @@ TrackSchema.statics = {
       });
   },
 
-  getTodayCheckIn() {
+  getTodayCheckIn(cardId) {
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     return this.find(
       {
-        checkIn: { $gte: new Date(startOfToday.setHours(0, 0, 0, 0)) }
+        checkIn: { $gte: new Date(startOfToday.setHours(0, 0, 0, 0)) },
+        cardId
       });
   },
 
