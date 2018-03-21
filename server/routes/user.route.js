@@ -33,14 +33,14 @@ router.param('userId', userCtrl.load);
 router
 /** Middlewear for checking if this admin */
     .use((req, res, next) => {
-      const decoded = jwt.verify(req.headers.authorization, config.jwtSecret);
+      const decoded = jwt.verify(req.headers.token, config.jwtSecret);
       if (decoded.type === 'admin' || decoded.username === req.body.username) {
         next();
       } else throw new APIError('Permission denied.', httpStatus.FORBIDDEN, true);
     });
 
 router.route('/:userId')
-    /** PUT /api/users/:userId - Update user */
+    /** PUT /api/users/:username - Update user */
     .put(validate(paramValidation.updateUser), userCtrl.update)
 
     /** DELETE /api/users/:userId - Delete user */

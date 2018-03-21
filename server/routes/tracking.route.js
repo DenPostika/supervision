@@ -12,4 +12,9 @@ router
   .route('/')
   /** GET /api/tracking - Get list of checkIns */
   .get(trackCtrl.list);
+
+router
+    .route('/month')
+    /** GET /api/tracking - Get list of checkIns */
+    .get(trackCtrl.monthList);
 export default router;

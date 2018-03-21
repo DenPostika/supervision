@@ -101,22 +101,23 @@ function createAdmin(req, res, next) {
  * @property {string} req.body.mobileNumber - The mobileNumber of user.
  * @returns {User}
  */
-function update(req, res, next) {
-  const user = req.user;
-  user.username = req.body.username;
-  user.mobileNumber = req.body.mobileNumber;
-  user.email = req.body.email;
-  user.password = passwordHash.generate(req.body.password);
-  user.type = req.body.type;
-  user.cardId = req.body.cardId;
-  user.slackName = req.body.slackName;
+/* TODO: create VALIDATION*/
 
-  user
-    .save((err, savedUser) => {
-      if (err) res.json(err);
-      else res.json(savedUser);
-    })
-    .catch(e => next(e));
+function update(req, res, next) {
+  let user = req.user;
+
+  req.body.password = req.body.password ? passwordHash.generate(req.body.password): user.password;
+
+  User.findOneAndUpdate({_id: user.id}, req.body, {upsert:true}, function(err, doc){
+      if (err) return res.send(500, { error: err });
+      doc.username = req.body.username ? req.body.username:doc.username;
+      doc.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber: doc.mobileNumber;
+      doc.email = req.body.email ? req.body.email: doc.email;
+      doc.type = req.body.type ? req.body.type: doc.type;
+      doc.cardId = req.body.cardId ? req.body.cardId: doc.cardId;
+      doc.slackName = req.body.slackName ? req.body.slackName: doc.slackName;
+      return res.json(doc);
+  });
 }
 
 /**

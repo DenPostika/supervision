@@ -105,9 +105,7 @@ function list(req, res, next) {
   Tracking.list({ limit, skip, cardId, dateStart, dateEnd })
     .then(tracks => {
       if (cardId){
-          if (sort == 'day') {
-            res.json(sortTracks(tracks));
-          }else res.json(sortTracksMonth(tracks));
+        res.json(sortTracks(tracks));
       }else res.json(tracks);
     })
     .catch(e => next(e));
@@ -122,17 +120,21 @@ function list(req, res, next) {
  */
 function monthList(req, res, next) {
     const {
+        limit = 50,
+        skip = 0,
         cardId = 0,
         dateStart = 0,
         dateEnd = Date.parse(new Date()),
     } = req.query;
     Tracking.list({ limit, skip, cardId, dateStart, dateEnd })
         .then(tracks => {
-            if (cardId){
-                res.json(sortTracks(tracks));
-            }else res.json(tracks);
+            if (cardId) {
+                res.json(sortTracksMonth(tracks))
+            } else {
+                throw new APIError('Invalid card number', httpStatus.UNAUTHORIZED, true);
+            }
         })
         .catch(e => next(e));
 }
 
-export default { checkIn, list };
+export default { checkIn, list, monthList };
