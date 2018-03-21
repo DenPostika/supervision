@@ -18,8 +18,34 @@ export const sortTracks = (records) => {
       date: day,
       worktime,
       comming,
+      lastCheckIn,
       leaving: worktime / 60 >= 9 ? lastCheckIn : null,
       onwork: !!(dates[day].length % 2)
+    });
+  }
+  return sortedRecords;
+};
+
+export const sortTracksMonth = (records) => {
+  moment.locale('uk');
+  let sortedRecords = [],
+    dates = [];
+
+  for (let i = 0; i < records.length; i++) {
+    const monthDate = moment(records[i].checkIn).format('MM');
+    const dayDate = moment(records[i].checkIn).format('L');
+    dates[monthDate] = !dates[monthDate] ? [] : dates[monthDate];
+    dates[monthDate][dayDate] = !dates[monthDate][dayDate] ? [] : dates[monthDate][dayDate];
+    dates[monthDate][dayDate].push(records[i]);
+  }
+  for (const month in dates) {
+    let worktime = 0;
+    for (const day in dates[month]) {
+      worktime += worktimeByDate(dates[month][day]);
+    }
+    sortedRecords.push({
+      date: month,
+      worktime,
     });
   }
   return sortedRecords;
@@ -39,3 +65,4 @@ function worktimeByDate(records) {
 
   return worktime;
 }
+

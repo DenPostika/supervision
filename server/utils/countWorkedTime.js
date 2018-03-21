@@ -9,7 +9,7 @@ export const countWorkedTime = records => {
 
   for (let i = 0; i < records.length; i += 2) {
     if (records[i + 1]) {
-      worktime = moment(records[i + 1].checkIn).diff(
+      worktime += moment(records[i + 1].checkIn).diff(
         moment(records[i].checkIn),
         'minutes'
       );

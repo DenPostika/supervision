@@ -30,6 +30,16 @@ export const comingMessage = (user, workTime) => {
   );
 };
 
+export const overtimeMessage = (user) => {
+    Bot.postMessageToUser(
+        user.slackName,
+        `Начало сверхурочной работы в \`${moment().format('LT')}\``,
+        {
+            as_user: true,
+        },
+    );
+};
+
 export const leavingMessage = (user, workTime) => {
   Bot.postMessageToUser(
     user.slackName,
