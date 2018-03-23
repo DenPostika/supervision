@@ -17,7 +17,7 @@ export const countWorkedTime = records => {
   }
 
   return {
-    hours: Math.round(worktime / 60),
+    hours: Math.floor(worktime / 60),
     minutes: worktime % 60,
   };
 };

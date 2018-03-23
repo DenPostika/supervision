@@ -51,10 +51,10 @@ TrackSchema.statics = {
 
   getTodayCheckIn(cardId) {
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
     return this.find(
       {
-        checkIn: { $gte: new Date(startOfToday.setHours(0, 0, 0, 0)) },
+        checkIn: { $gte: new Date(startOfToday.setHours(0, 0, 0, 0)), $lte: new Date(now.getFullYear(), now.getMonth(), now.getDate()) },
         cardId
       });
   },

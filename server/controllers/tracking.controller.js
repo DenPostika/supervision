@@ -100,11 +100,15 @@ function list(req, res, next) {
     cardId = 0,
     dateStart = 0,
     dateEnd = Date.parse(new Date()),
-    sort = 'day',
   } = req.query;
   Tracking.list({ limit, skip, cardId, dateStart, dateEnd })
     .then(tracks => {
       if (cardId){
+          Tracking.getTodayCheckIn(cardId)
+              .then(records => {
+                  console.log(countWorkedTime(records))
+              })
+              .catch(e => next(e));
         res.json(sortTracks(tracks));
       }else res.json(tracks);
     })
