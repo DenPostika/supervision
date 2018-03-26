@@ -49,12 +49,14 @@ function checkIn(req, res, next) {
 
               Tracking.getTodayCheckIn(user.cardId)
                   .then(records => {
+                      console.log(records)
                     let workTime = null;
                     if (!records.length) {
                       // First coming today
                       firstComingMessage(user);
                     } else {
                       workTime = countWorkedTime(records);
+                        console.log(workTime)
                       if (workTime.hours < 9 && records.length % 2) {
                         // Coming
                         comingMessage(user, workTime);
