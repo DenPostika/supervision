@@ -142,7 +142,7 @@ TrackSchema.statics = {
         checkIn:
         {
           $gt: new Date(dateStart),
-          $lte: end.setDate(end.getDate() + 1)
+          $lte: end.setDate(end.getDate())
         },
         cardId
       };
