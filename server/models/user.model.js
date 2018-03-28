@@ -186,7 +186,7 @@ UserSchema.statics = {
   /**
    * Check if user with card exist
    * @param {cardId} cardid - The Id of user card.
-   * @returns {Promise<Tracking, APIError>}
+   * @returns {Promise<User, APIError>}
    */
   getUserByCard(cardId) {
     return this.find({

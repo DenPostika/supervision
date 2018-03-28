@@ -40,7 +40,7 @@ router
     });
 
 router.route('/:userId')
-    /** PUT /api/users/:username - Update user */
+    /** PUT /api/users/:userId - Update user */
     .put(validate(paramValidation.updateUser), userCtrl.update)
 
     /** DELETE /api/users/:userId - Delete user */

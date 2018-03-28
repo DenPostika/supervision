@@ -7,7 +7,7 @@ import User from '../models/user.model';
 import { sortTracks, sortTracksMonth} from '../utils/sortUserTracks';
 import { io } from '../../index';
 import { countWorkedTime } from '../utils/countWorkedTime';
-import { firstComingMessage, comingMessage, leavingMessage, overtimeMessage } from '../slack/messages';
+import { firstComingMessage, pauseMessage, comingMessage, leavingMessage, overtimeMessage } from '../slack/messages';
 
 /**
  * Returns checkIn data and save it
@@ -49,15 +49,13 @@ function checkIn(req, res, next) {
 
               Tracking.getTodayCheckIn(user.cardId)
                   .then(records => {
-                      console.log(records)
                     let workTime = null;
                     if (!records.length) {
                       // First coming today
                       firstComingMessage(user);
                     } else {
                       workTime = countWorkedTime(records);
-                        console.log(workTime)
-                      if (workTime.hours < 9 && records.length % 2) {
+                      if (workTime.hours < 9 && records.length % 2 !== 0) {
                         // Coming
                         comingMessage(user, workTime);
                       } else if (workTime.hours >= 9 && records.length % 2) {
@@ -66,6 +64,8 @@ function checkIn(req, res, next) {
                       } else if (workTime.hours >= 9) {
                         // Leaving
                         leavingMessage(user, workTime);
+                      } else {
+                          pauseMessage(user, workTime);
                       }
                     }
                   })

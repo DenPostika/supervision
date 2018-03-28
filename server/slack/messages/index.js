@@ -49,3 +49,17 @@ export const leavingMessage = (user, workTime) => {
     },
   );
 };
+
+export const pauseMessage = (user, workTime) => {
+    Bot.postMessageToUser(
+        user.slackName,
+        `Ты отработал уже *${workTime.hours} ч ${
+            workTime.minutes
+        } м*. Тебе необходимо еще отработать \`${
+            workTime.minutes !== 0 ? 8 - workTime.hours: 9 - workTime.hours
+        }\` ч \`${workTime.minutes !== 0 ? 60 - workTime.minutes : 0}\` м`,
+        {
+            as_user: true,
+        },
+    );
+};

@@ -32,6 +32,23 @@ export default {
     }
   },
 
+  // POST /api/calendar
+  calendar: {
+    body: {
+      cardId: Joi.string().required(),
+      date: Joi.date().required()
+    }
+  },
+
+  // PUT /api/calendar
+  calendarUpdate: {
+    body: {
+      cardId: Joi.string().required(),
+      date: Joi.date().required(),
+      status: Joi.string().required()
+    }
+  },
+
   // POST /api/tracking/chekin
   checkin: {
     body: {

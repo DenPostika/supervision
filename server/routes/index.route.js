@@ -6,6 +6,7 @@ import APIError from '../helpers/APIError';
 import config from '../../config/config';
 import userRoutes from './user.route';
 import authRoutes from './auth.route';
+import calendarRoutes from './calendar.route';
 import trackingRoutes from './tracking.route';
 
 const exeption = {
@@ -54,6 +55,9 @@ router
 
 // mount user routes at /users
 router.use('/users', userRoutes);
+
+// mount auth routes at /calendar
+router.use('/calendar', calendarRoutes);
 
 // mount auth routes at /tracking
 router.use('/tracking', trackingRoutes);
