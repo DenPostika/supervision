@@ -34,7 +34,7 @@ router
 /** Middlewear for checking if this admin */
     .use((req, res, next) => {
       const decoded = jwt.verify(req.headers.token, config.jwtSecret);
-      if (decoded.type === 'admin' || decoded.username === req.body.username) {
+      if (decoded.type === 'admin' || req.url.replace('/', '') === decoded.userId) {
         next();
       } else throw new APIError('Permission denied.', httpStatus.FORBIDDEN, true);
     });

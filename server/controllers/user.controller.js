@@ -105,10 +105,10 @@ function createAdmin(req, res, next) {
 
 function update(req, res, next) {
   let user = req.user;
-
-  req.body.password = req.body.password ? passwordHash.generate(req.body.password): user.password;
-
-  User.findOneAndUpdate({_id: user.id}, req.body, {upsert:true, runValidators: true}, function(err, doc){
+  if(req.body.password){
+      req.body.password = passwordHash.generate(req.body.password)
+  }
+  User.findOneAndUpdate({_id: user.id}, req.body, {upsert:false, runValidators: true}, function(err, doc){
       if (err) return res.send(500, { error: err });
       doc.username = req.body.username ? req.body.username:doc.username;
       doc.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber: doc.mobileNumber;
