@@ -69,6 +69,18 @@ DaySchema.statics = {
             });
   },
     /**
+     * Remove user days
+     * @param {number} cardId - The Id of user card.
+     * @returns {Promise<Calendar, APIError>}
+     */
+  removeDaysByCardId(cardId) {
+    return this.find({
+      cardId
+    })
+        .remove()
+        .exec();
+  },
+    /**
      * List users in descending order of 'createdAt' timestamp.
      * @param {number} skip - Number of days to be skipped.
      * @param {number} cardId - user's card Id.

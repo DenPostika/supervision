@@ -51,6 +51,46 @@ function create(req, res, next) {
 }
 
 /**
+ * Generate calendar
+ * @property {string} req.body.cardId - The cardId of user.
+ * @property {string} req.body.status - The status of day.
+ * @property {date} req.body.date - The date of day formated in yyyy-mm-dd.
+ * @returns {Day}
+ */
+function generate(req, res, next) {
+  User.getUserByCard(req.body.cardId)
+        .then((user) => {
+          if (user) {
+            Calendar.removeDaysByCardId(req.body.cardId);
+            const date = new Date();
+            const year = date.getFullYear();
+            date.setDate(1);
+            date.setMonth(0);
+            while (date.getFullYear() === year) {
+              if (date.getDay() === 0 || date.getDay() === 6) {
+                const day = new Calendar({
+                  date: new Date(date),
+                  status: 'weekend',
+                  cardId: req.body.cardId,
+                });
+                day.save();
+              }
+              date.setDate(date.getDate() + 1);
+            }
+            res.send('OK');
+          } else {
+            throw new APIError(
+                    'Invalid card number',
+                    httpStatus.UNAUTHORIZED,
+                    true
+                );
+          }
+        })
+        .catch((e) => {
+          next(e);
+        });
+}
+/**
  * Update existing date
  * @property {string} req.body.username - The username of user.
  * @property {string} req.body.mobileNumber - The mobileNumber of user.
@@ -88,18 +128,17 @@ function update(req, res, next) {
  */
 function list(req, res, next) {
   const {
-        limit = 50,
         skip = 0,
         cardId = 0,
         dateStart = 0,
         dateEnd = Date.parse(new Date()),
         status = 'all'
     } = req.query;
-  Calendar.dayList({ limit, skip, cardId, dateStart, dateEnd, status })
+  Calendar.dayList({ skip, cardId, dateStart, dateEnd, status })
         .then((days) => {
           res.json(days);
         })
         .catch(e => next(e));
 }
 
-export default { create, list, get, update };
+export default { create, list, get, update, generate };

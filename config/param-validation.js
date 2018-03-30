@@ -51,6 +51,13 @@ export default {
     }
   },
 
+  // POST /api/calendar/generate
+  calendarGenerate: {
+    body: {
+      cardId: Joi.string().required(),
+    }
+  },
+
   // POST /api/tracking/chekin
   checkin: {
     body: {

@@ -17,4 +17,8 @@ router
     /** GET /api/calendar - Get list of days */
     .get(CalendarCtrl.list);
 
+router.route('/generate')
+/** POST /api/calendar - Returns day data and save it */
+    .post(validate(paramValidation.calendarGenerate), CalendarCtrl.generate)
+
 export default router;
