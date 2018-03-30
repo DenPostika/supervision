@@ -98,7 +98,7 @@ DaySchema.statics = {
         $lte: end.setDate(end.getDate() + 1)
       }
     };
-    if (cardId) {
+    if (cardId && +cardId !== 0) {
       findObj.cardId = cardId;
     }
     if (status !== 'all') {

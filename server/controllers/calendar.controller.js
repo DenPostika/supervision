@@ -136,7 +136,13 @@ function list(req, res, next) {
     } = req.query;
   Calendar.dayList({ skip, cardId, dateStart, dateEnd, status })
         .then((days) => {
-          res.json(days);
+          const output = {};
+          for (const day in days) {
+            const card = days[day].cardId
+            output[card] = !output[card] ? [] : output[card];
+            output[card].push({ date: days[day].date, status: days[day].status });
+          }
+          res.json(output);
         })
         .catch(e => next(e));
 }
