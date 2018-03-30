@@ -91,7 +91,7 @@ TrackSchema.statics = {
     return this.find({
       checkIn:
       {
-        $gt: new Date(date),
+        $gt: new Date(day.setHours(0, 0, 0, 0)),
         $lte: day.setDate(day.getDate() + 1)
       },
       cardId
