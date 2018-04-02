@@ -21,7 +21,7 @@ export const comingMessage = (user, workTime) => {
     `Ты отработал уже *${workTime.hours} ч ${
       workTime.minutes
     } м* ты можешь уйти в \`${moment()
-      .add(9 - workTime.hours, 'hours')
+      .add(workTime.minutes !== 0 ? 8 : 9 - workTime.hours, 'hours')
       .add(workTime.minutes !== 0 ? 60 - workTime.minutes : 0, 'minutes')
       .format('LT')}\``,
     {

@@ -135,16 +135,36 @@ function list(req, res, next) {
         status = 'all'
     } = req.query;
   Calendar.dayList({ skip, cardId, dateStart, dateEnd, status })
-        .then((days) => {
-          const output = {};
+        .then(days => Promise.all([days, User.list()]))
+        .then((results) => {
+          const days = results[0];
+          const users = results[1];
+          const output = [];
           for (const day in days) {
-            const card = days[day].cardId
-            output[card] = !output[card] ? [] : output[card];
-            output[card].push({ date: days[day].date, status: days[day].status });
+            const card = days[day].cardId;
+            const user = userByCard(users, card);
+            const elem = output.findIndex(elem => elem.cardId == card);
+            if (elem < 0) {
+              output.push({
+                userId: user.id,
+                cardId: card,
+                data: [{
+                  date: days[day].date,
+                  status: days[day].status
+                }]
+              });
+            } else {
+              output[elem].data.push({ date: days[day].date, status: days[day].status });
+            }
           }
           res.json(output);
         })
         .catch(e => next(e));
 }
+
+function userByCard(users, cardId) {
+  return users.filter(user => user.cardId == cardId)[0];
+}
+
 
 export default { create, list, get, update, generate };
