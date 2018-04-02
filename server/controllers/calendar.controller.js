@@ -148,6 +148,7 @@ function list(req, res, next) {
               output.push({
                 userId: user.id,
                 cardId: card,
+                username: user.username,
                 data: [{
                   date: days[day].date,
                   status: days[day].status
