@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import passwordHash from 'password-hash';
 import APIError from '../helpers/APIError';
 import User from '../models/user.model';
+import Tracking from '../models/tracking.model';
 import config from '../../config/config';
 
 /**
@@ -114,8 +115,11 @@ function update(req, res, next) {
       doc.mobileNumber = req.body.mobileNumber ? req.body.mobileNumber: doc.mobileNumber;
       doc.email = req.body.email ? req.body.email: doc.email;
       doc.type = req.body.type ? req.body.type: doc.type;
-      doc.cardId = req.body.cardId ? req.body.cardId: doc.cardId;
       doc.slackName = req.body.slackName ? req.body.slackName: doc.slackName;
+      if(req.body.cardId){
+        Tracking.updateCard(doc.cardId, req.body.cardId)
+        doc.cardId = req.body.cardId;
+      }
       return res.json(doc);
   });
 }

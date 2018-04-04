@@ -100,6 +100,16 @@ TrackSchema.statics = {
         .exec();
   },
 
+  updateCard(oldCard, newCard) {
+    return this.update(
+      { cardId: oldCard },
+      { $set: { cardId: newCard } },
+      { multi: true },
+      (err, num) => err ? Promise.reject(new APIError(`${err}. ${num} elements has been updated`, httpStatus.FORBIDDEN)) :
+            `${num} elements has been updated`
+    );
+  },
+
     /**
      * Get checkIns by cardId
      * @param {string} cardId - The card number.

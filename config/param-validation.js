@@ -37,7 +37,7 @@ export default {
   // POST /api/calendar
   calendar: {
     body: {
-      cardId: Joi.string().required(),
+      userId: Joi.string().required(),
       date: Joi.date().required()
     }
   },
@@ -45,7 +45,7 @@ export default {
   // PUT /api/calendar
   calendarUpdate: {
     body: {
-      cardId: Joi.string().required(),
+      userId: Joi.string().required(),
       date: Joi.date().required(),
       status: Joi.string().required()
     }
@@ -54,7 +54,7 @@ export default {
   // POST /api/calendar/generate
   calendarGenerate: {
     body: {
-      cardId: Joi.string().required(),
+      userId: Joi.string().required(),
     }
   },
 

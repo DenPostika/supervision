@@ -20,13 +20,13 @@ function get(req, res) {
  * @returns {Day}
  */
 function create(req, res, next) {
-  User.getUserByCard(req.body.cardId)
+  User.get(req.body.userId)
         .then((user) => {
           if (user) {
             const day = new Calendar({
               date: moment(req.body.date).format(),
               status: req.body.status,
-              cardId: req.body.cardId,
+              userId: req.body.userId,
             });
             day.save((err, savedDay) => {
               if (err) res.json(err);
@@ -58,10 +58,10 @@ function create(req, res, next) {
  * @returns {Day}
  */
 function generate(req, res, next) {
-  User.getUserByCard(req.body.cardId)
+  User.get(req.body.userId)
         .then((user) => {
           if (user) {
-            Calendar.removeDaysByCardId(req.body.cardId);
+            Calendar.removeDaysByUserId(req.body.userId);
             const date = new Date();
             const year = date.getFullYear();
             date.setDate(1);
@@ -71,7 +71,7 @@ function generate(req, res, next) {
                 const day = new Calendar({
                   date: new Date(date),
                   status: 'weekend',
-                  cardId: req.body.cardId,
+                  userId: req.body.userId,
                 });
                 day.save();
               }
@@ -98,7 +98,7 @@ function generate(req, res, next) {
  */
 
 function update(req, res, next) {
-  Calendar.getDayByDate(moment(req.body.date).format(), req.body.cardId)
+  Calendar.getDayByDate(moment(req.body.date).format(), req.body.userId)
         .then((dateDay) => {
           if (dateDay) {
             Calendar.findOneAndUpdate({ _id: dateDay.id }, req.body, { upsert: true }, (err, doc) => {
@@ -129,25 +129,25 @@ function update(req, res, next) {
 function list(req, res, next) {
   const {
         skip = 0,
-        cardId = 0,
+        userId = 0,
         dateStart = 0,
         dateEnd = Date.parse(new Date()),
         status = 'all'
     } = req.query;
-  Calendar.dayList({ skip, cardId, dateStart, dateEnd, status })
+  Calendar.dayList({ skip, userId, dateStart, dateEnd, status })
         .then(days => Promise.all([days, User.list()]))
         .then((results) => {
           const days = results[0];
           const users = results[1];
           const output = [];
           for (const day in days) {
-            const card = days[day].cardId;
-            const user = userByCard(users, card);
-            const elem = output.findIndex(elem => elem.cardId == card);
+            const uId = days[day].userId;
+            const user = userById(users, uId);
+            const elem = output.findIndex(elem => elem.userId == uId);
             if (elem < 0) {
               output.push({
                 userId: user.id,
-                cardId: card,
+                cardId: user.cardId,
                 username: user.username,
                 data: [{
                   date: days[day].date,
@@ -163,8 +163,8 @@ function list(req, res, next) {
         .catch(e => next(e));
 }
 
-function userByCard(users, cardId) {
-  return users.filter(user => user.cardId == cardId)[0];
+function userById(users, userId) {
+  return users.filter(user => user.id == userId)[0];
 }
 
 

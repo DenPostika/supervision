@@ -8,7 +8,7 @@ import Tracking from './tracking.model';
  * Day Schema
  */
 const DaySchema = new mongoose.Schema({
-  cardId: {
+  userId: {
     type: String,
     required: true
   },
@@ -54,10 +54,10 @@ DaySchema.statics = {
      * @param {number} cardId - The Id of user card.
      * @returns {Promise<Calendar, APIError>}
      */
-  getDayByDate(date, cardId) {
+  getDayByDate(date, id) {
     return this.findOne({
       date,
-      cardId
+      id
     })
             .exec()
             .then((day) => {
@@ -73,9 +73,9 @@ DaySchema.statics = {
      * @param {number} cardId - The Id of user card.
      * @returns {Promise<Calendar, APIError>}
      */
-  removeDaysByCardId(cardId) {
+  removeDaysByUserId(userId) {
     return this.find({
-      cardId
+      userId
     })
         .remove()
         .exec();
@@ -89,7 +89,7 @@ DaySchema.statics = {
      * @param {string} status - status of the day.
      * @returns {Promise<Calendar[]>}
      */
-  dayList({ skip = 0, cardId = 0, dateStart = 0, dateEnd = Date.parse(new Date()), status = 'all' } = {}) {
+  dayList({ skip = 0, userId = 0, dateStart = 0, dateEnd = Date.parse(new Date()), status = 'all' } = {}) {
     const end = new Date(dateEnd);
     const findObj = {
       date:
@@ -98,8 +98,8 @@ DaySchema.statics = {
         $lte: end.setDate(end.getDate() + 1)
       }
     };
-    if (cardId && +cardId !== 0) {
-      findObj.cardId = cardId;
+    if (userId && +userId !== 0) {
+      findObj.userId = userId;
     }
     if (status !== 'all') {
       findObj.status = status;
