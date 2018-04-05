@@ -54,10 +54,15 @@ DaySchema.statics = {
      * @param {number} cardId - The Id of user card.
      * @returns {Promise<Calendar, APIError>}
      */
-  getDayByDate(date, id) {
+  getDayByDate(date, userId) {
+    const end = new Date(date);
     return this.findOne({
-      date,
-      id
+      date:
+      {
+        $gt: new Date(date),
+        $lte: end.setDate(end.getDate() + 1)
+      },
+      userId
     })
             .exec()
             .then((day) => {

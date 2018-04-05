@@ -101,7 +101,7 @@ function update(req, res, next) {
   Calendar.getDayByDate(moment(req.body.date).format(), req.body.userId)
         .then((dateDay) => {
           if (dateDay) {
-            Calendar.findOneAndUpdate({ _id: dateDay.id }, req.body, { upsert: true }, (err, doc) => {
+            Calendar.findOneAndUpdate({ _id: dateDay.id }, {status: req.body.status }, { upsert: true }, (err, doc) => {
               if (err) return res.send(500, { error: err });
               doc.status = req.body.status;
               return res.json(doc);
