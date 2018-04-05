@@ -59,8 +59,8 @@ DaySchema.statics = {
     return this.findOne({
       date:
       {
-        $gt: new Date(date),
-        $lte: end.setDate(end.getDate() + 1)
+        $gte: new Date(date),
+        $lt: end.setDate(end.getDate() + 1)
       },
       userId
     })
