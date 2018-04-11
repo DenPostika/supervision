@@ -11,6 +11,11 @@ import config from '../../config/config';
 const router = express.Router(); // eslint-disable-line new-cap
 
 router
+    .route('/')
+    /** GET /api/calendar - Get list of days */
+    .get(CalendarCtrl.list);
+
+router
 /** Middleware for checking if this admin */
     .use((req, res, next) => {
       const decoded = jwt.verify(req.headers.token, config.jwtSecret);
@@ -25,11 +30,6 @@ router.route('/')
 
         /** PUT /api/calendar/ - Update day */
       .put(validate(paramValidation.calendarUpdate), CalendarCtrl.update);
-
-router
-    .route('/')
-    /** GET /api/calendar - Get list of days */
-    .get(CalendarCtrl.list);
 
 router.route('/generate')
 /** POST /api/calendar - Returns day data and save it */
