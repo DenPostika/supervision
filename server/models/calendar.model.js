@@ -99,8 +99,8 @@ DaySchema.statics = {
     const findObj = {
       date:
       {
-        $gt: new Date(dateStart),
-        $lte: end.setDate(end.getDate() + 1)
+        $gte: new Date(dateStart),
+        $lt: end.setDate(end.getDate() + 1)
       }
     };
     if (userId && +userId !== 0) {

@@ -31,7 +31,7 @@ router.param('userId', userCtrl.load);
 
 /* TODO: create role-permission collection*/
 router
-/** Middlewear for checking if this admin */
+/** Middleware for checking if this admin */
     .use((req, res, next) => {
       const decoded = jwt.verify(req.headers.token, config.jwtSecret);
       if (decoded.type === 'admin' || req.url.replace('/', '') === decoded.userId) {
