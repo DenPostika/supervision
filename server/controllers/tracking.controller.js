@@ -45,7 +45,6 @@ function checkIn(req, res, next) {
               let tracking = new Tracking({
                   cardId: user.cardId,
               });
-              tracking.save();
 
               moment.locale('uk');
 
@@ -60,18 +59,21 @@ function checkIn(req, res, next) {
                       if (workTime.hours < 9 && records.length % 2 !== 0) {
                         // Coming
                         comingMessage(user, workTime);
-                      } else if (workTime.hours >= 9 && records.length % 2) {
-                        // Leaving
+                      } else if (workTime.hours < 9){
+                        // Work on pause
+                        pauseMessage(user, workTime);
+                      } else if (workTime.hours >= 9 && records.length % 2 !== 0) {
+                        // Overtime
                         overtimeMessage(user, workTime);
                       } else if (workTime.hours >= 9) {
                         // Leaving
                         leavingMessage(user, workTime);
-                      } else {
-                          pauseMessage(user, workTime);
                       }
                     }
                   })
                   .catch(e => next(e));
+
+              // tracking.save();
               res.json(tracking);
           }
         } else {

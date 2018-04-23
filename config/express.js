@@ -46,6 +46,11 @@ if (config.env === 'development') {
   }));
 }
 
+/** GET / - Welcome */
+app.get('/', (req, res) =>
+    res.send('Welcome to LeadIntelligence worktime controll API.')
+);
+
 // mount all routes on /api path
 app.use('/api', routes);
 
