@@ -73,7 +73,7 @@ function checkIn(req, res, next) {
                   })
                   .catch(e => next(e));
 
-              // tracking.save();
+              tracking.save();
               res.json(tracking);
           }
         } else {
